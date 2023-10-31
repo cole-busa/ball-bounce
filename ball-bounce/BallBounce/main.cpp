@@ -1,5 +1,12 @@
 #include <GLFW/glfw3.h>
 
+
+//Global variables
+const char* title = "Ball Bounce";
+unsigned int screen_width = 640;
+unsigned int screen_height = 480;
+
+
 int main(void)
 {
     GLFWwindow* window;
@@ -9,7 +16,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(screen_width, screen_height, title, NULL, NULL);
     if (!window)
     {
         glfwTerminate();
