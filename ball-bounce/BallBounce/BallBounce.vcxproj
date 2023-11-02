@@ -143,12 +143,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="glad.c" />
-    <ClCompile Include="graphics\Shader.cpp" />
+    <ClCompile Include="graphics\resource_manager.cpp" />
+    <ClCompile Include="graphics\shader.cpp" />
+    <ClCompile Include="graphics\texture.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="graphics\Shader.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="graphics\resource_manager.h" />
+    <ClInclude Include="graphics\shader.h" />
+    <ClInclude Include="graphics\stb_image.h" />
+    <ClInclude Include="graphics\texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
