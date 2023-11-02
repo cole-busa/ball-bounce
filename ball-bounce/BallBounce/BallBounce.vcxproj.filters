@@ -44,9 +44,6 @@
     <ClInclude Include="game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="graphics\resource_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
