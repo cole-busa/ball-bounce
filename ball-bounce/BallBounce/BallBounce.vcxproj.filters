@@ -42,6 +42,9 @@
     <ClCompile Include="game\game_level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\ball_object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics\shader.h">
@@ -63,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\game_level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\ball_object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
