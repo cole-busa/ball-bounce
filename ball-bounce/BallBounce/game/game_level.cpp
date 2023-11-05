@@ -51,17 +51,17 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
     unsigned int width = tileData[0].size(); // note we can index vector at [0] since this function is only called if height > 0
     float unit_width = levelWidth / static_cast<float>(width), unit_height = levelHeight / height;
     // initialize level tiles based on tileData		
-    for (unsigned int y = 0; y < height; ++y)
+    for (unsigned int y = 0; y < height; y++)
     {
-        for (unsigned int x = 0; x < width; ++x)
+        for (unsigned int x = 0; x < width; x++)
         {
             // check block type from level data (2D level array)
-            if (tileData[y][x] == 1) // solid
+            if (tileData[y][x] == 1) // bouncy block
             {
                 glm::vec2 pos(unit_width * x, unit_height * y);
                 glm::vec2 size(unit_width, unit_height);
-                GameObject obj(pos, size, ResourceManager::GetTexture("block_solid"), glm::vec3(0.8f, 0.8f, 0.7f));
-                obj.IsSolid = true;
+                GameObject obj(pos, size, ResourceManager::GetTexture("block_solid"), glm::vec3(1.0f, 0.75f, 0.8f));
+                obj.IsBouncy = true;
                 this->Bricks.push_back(obj);
             }
             else if (tileData[y][x] > 1)	// non-solid; now determine its color based on level data

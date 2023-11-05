@@ -149,15 +149,21 @@ void Game::DoCollisions()
             Collision collision = CheckCollision(*Ball, box);
             if (std::get<0>(collision)) // if collision is true
             {
+                float multiplier = 1;
+
                 // destroy block if not solid
                 if (!box.IsSolid)
                     box.Destroyed = true;
+                //Check if bouncy
+                if (box.IsBouncy)
+                    multiplier = 1.1;
+
                 // collision resolution
                 Direction dir = std::get<1>(collision);
                 glm::vec2 diff_vector = std::get<2>(collision);
                 if (dir == LEFT || dir == RIGHT) // horizontal collision
                 {
-                    Ball->Velocity.x = -Ball->Velocity.x; // reverse horizontal velocity
+                    Ball->Velocity.x = -multiplier * Ball->Velocity.x; // reverse horizontal velocity
                     // relocate
                     float penetration = Ball->Radius - std::abs(diff_vector.x);
                     if (dir == LEFT)
@@ -167,7 +173,7 @@ void Game::DoCollisions()
                 }
                 else // vertical collision
                 {
-                    Ball->Velocity.y = -Ball->Velocity.y; // reverse vertical velocity
+                    Ball->Velocity.y = -multiplier * Ball->Velocity.y; // reverse vertical velocity
                     // relocate
                     float penetration = Ball->Radius - std::abs(diff_vector.y);
                     if (dir == UP)
