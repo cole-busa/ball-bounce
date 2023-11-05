@@ -4,6 +4,8 @@
 #include "game/game_object.h"
 #include "game/ball_object.h"
 
+#include <iostream>
+
 // Game-related State data
 SpriteRenderer* Renderer;
 GameObject* Player;
@@ -40,7 +42,7 @@ void Game::Init()
     ResourceManager::LoadTexture("graphics/block_solid.png", false, "block_solid");
     ResourceManager::LoadTexture("graphics/paddle.png", true, "paddle");
     // load levels
-    GameLevel one; one.Load("levels/one.lvl", this->Width, this->Height / 2);
+    GameLevel one; one.Load("levels/test.lvl", this->Width, this->Height / 2);
     GameLevel two; two.Load("levels/two.lvl", this->Width, this->Height / 2);
     GameLevel three; three.Load("levels/three.lvl", this->Width, this->Height / 2);
     GameLevel four; four.Load("levels/four.lvl", this->Width, this->Height / 2);
@@ -65,6 +67,12 @@ void Game::Update(float dt)
     // check loss condition
     if (Ball->Position.y >= this->Height) // did ball reach bottom edge?
     {
+        this->ResetLevel();
+        this->ResetPlayer();
+    }
+    if (this->State == GAME_WIN) {
+        this->State = GAME_ACTIVE;
+        this->Level = this->Level + 1;
         this->ResetLevel();
         this->ResetPlayer();
     }
@@ -161,7 +169,7 @@ void Game::DoCollisions()
                     multiplier = 1.1;
                 //Check if clone
                 if (box.IsEnlarging) {
-                    Ball = new BallObject(Ball->Position , Ball->Radius * 2, Ball->Velocity, ResourceManager::GetTexture("face"));
+                    Ball = new BallObject(Ball->Position, Ball->Radius * 2, Ball->Velocity, ResourceManager::GetTexture("face"));
                     Ball->Stuck = false;
                 }
 
@@ -207,6 +215,19 @@ void Game::DoCollisions()
         Ball->Velocity = glm::normalize(Ball->Velocity) * glm::length(oldVelocity); // keep speed consistent over both axes (multiply by length of old velocity, so total strength is not changed)
         // fix sticky paddle
         Ball->Velocity.y = -1.0f * abs(Ball->Velocity.y);
+    }
+    
+    //Check if all blocks are destroyed
+    bool won = true;
+    for (GameObject& box : this->Levels[this->Level].Bricks)
+    {
+        if (!box.Destroyed)
+        {
+            won = false;
+        }
+    }
+    if (won) {
+        this->State = GAME_WIN;
     }
 }
 
