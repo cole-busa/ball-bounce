@@ -21,6 +21,7 @@ public:
     bool        IsSolid;
     bool        Destroyed;
     bool        IsBouncy;
+    bool        IsEnlarging;
     // render state
     Texture2D   Sprite;
     // constructor(s)

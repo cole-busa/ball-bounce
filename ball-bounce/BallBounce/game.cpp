@@ -94,8 +94,9 @@ void Game::ProcessInput(float dt)
                     Ball->Position.x += velocity;
             }
         }
-        if (this->Keys[GLFW_KEY_SPACE])
+        if (this->Keys[GLFW_KEY_SPACE]) {
             Ball->Stuck = false;
+        }
     }
 }
 
@@ -132,6 +133,7 @@ void Game::ResetPlayer()
     // reset player/ball stats
     Player->Size = PLAYER_SIZE;
     Player->Position = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
+    Ball = new BallObject(Ball->Position, BALL_RADIUS, Ball->Velocity, ResourceManager::GetTexture("face"));
     Ball->Reset(Player->Position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
 }
 
@@ -157,6 +159,11 @@ void Game::DoCollisions()
                 //Check if bouncy
                 if (box.IsBouncy)
                     multiplier = 1.1;
+                //Check if clone
+                if (box.IsEnlarging) {
+                    Ball = new BallObject(Ball->Position , Ball->Radius * 2, Ball->Velocity, ResourceManager::GetTexture("face"));
+                    Ball->Stuck = false;
+                }
 
                 // collision resolution
                 Direction dir = std::get<1>(collision);
