@@ -1,3 +1,17 @@
 ﻿  game.cpp
-C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game.cpp(170,37): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game.cpp(152,37): warning C4305: '=': truncation from 'double' to 'float'
+  ball_object.cpp
+  game_level.cpp
+C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game\game_level.cpp(44,42): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game\game_level.cpp(45,44): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game\game_level.cpp(46,76): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+  game_object.cpp
+  resource_manager.cpp
+  shader.cpp
+  sprte_renderer.cpp
+  texture.cpp
+  main.cpp
+C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\main.cpp(61,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Generating Code...
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   BallBounce.vcxproj -> C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\x64\Debug\BallBounce.exe

@@ -35,28 +35,27 @@ const float BALL_RADIUS = 12.5f;
 // Game holds all game-related state and functionality.
 // Combines all game-related data into a single class for
 // easy access to each of the components and manageability.
-class Game
-{
-public:
-    // game state
-    GameState               State;
-    bool                    Keys[1024];
-    unsigned int            Width, Height;
-    std::vector<GameLevel>  Levels;
-    unsigned int            Level;
-    // constructor/destructor
-    Game(unsigned int width, unsigned int height);
-    ~Game();
-    // initialize game state (load all shaders/textures/levels)
-    void Init();
-    // game loop
-    void ProcessInput(float dt);
-    void Update(float dt);
-    void Render();
-    void DoCollisions();
-    // reset
-    void ResetLevel();
-    void ResetPlayer();
+class Game {
+    public:
+        // game state
+        GameState               State;
+        bool                    Keys[1024];
+        unsigned int            Width, Height;
+        std::vector<GameLevel>  Levels;
+        unsigned int            Level;
+        // constructor/destructor
+        Game(unsigned int width, unsigned int height);
+        ~Game();
+        // initialize game state (load all shaders/textures/levels)
+        void Init();
+        // game loop
+        void ProcessInput(float dt);
+        void Update(float dt);
+        void Render();
+        void DoCollisions();
+        // reset
+        void ResetLevel();
+        void ResetPlayer();
 };
 
 #endif

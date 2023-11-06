@@ -4,8 +4,7 @@
 #include <sstream>
 
 
-void GameLevel::Load(const char* file, unsigned int levelWidth, unsigned int levelHeight)
-{
+void GameLevel::Load(const char* file, unsigned int levelWidth, unsigned int levelHeight) {
     // clear old data
     this->Bricks.clear();
     // load from file
@@ -14,10 +13,8 @@ void GameLevel::Load(const char* file, unsigned int levelWidth, unsigned int lev
     std::string line;
     std::ifstream fstream(file);
     std::vector<std::vector<unsigned int>> tileData;
-    if (fstream)
-    {
-        while (std::getline(fstream, line)) // read each line from level file
-        {
+    if (fstream) {
+        while (std::getline(fstream, line)) {
             std::istringstream sstream(line);
             std::vector<unsigned int> row;
             while (sstream >> tileCode) // read each word separated by spaces
@@ -29,51 +26,43 @@ void GameLevel::Load(const char* file, unsigned int levelWidth, unsigned int lev
     }
 }
 
-void GameLevel::Draw(SpriteRenderer& renderer)
-{
+void GameLevel::Draw(SpriteRenderer& renderer) {
     for (GameObject& tile : this->Bricks)
         if (!tile.Destroyed)
             tile.Draw(renderer);
 }
 
-bool GameLevel::IsCompleted()
-{
+bool GameLevel::IsCompleted() {
     for (GameObject& tile : this->Bricks)
         if (!tile.IsSolid && !tile.Destroyed)
             return false;
     return true;
 }
 
-void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight)
-{
+void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight) {
     // calculate dimensions
     unsigned int height = tileData.size();
     unsigned int width = tileData[0].size(); // note we can index vector at [0] since this function is only called if height > 0
     float unit_width = levelWidth / static_cast<float>(width), unit_height = levelHeight / height;
     // initialize level tiles based on tileData		
-    for (unsigned int y = 0; y < height; y++)
-    {
-        for (unsigned int x = 0; x < width; x++)
-        {
+    for (unsigned int y = 0; y < height; y++) {
+        for (unsigned int x = 0; x < width; x++) {
             // check block type from level data (2D level array)
-            if (tileData[y][x] == 0) // bouncy block
-            {
+            if (tileData[y][x] == 0) {
                 glm::vec2 pos(unit_width * x, unit_height * y);
                 glm::vec2 size(unit_width, unit_height);
                 GameObject obj(pos, size, ResourceManager::GetTexture("block"), glm::vec3(0.0f, 1.0f, 1.0f));
                 obj.IsEnlarging = true;
                 this->Bricks.push_back(obj);
             }
-            if (tileData[y][x] == 1) // bouncy block
-            {
+            if (tileData[y][x] == 1) {
                 glm::vec2 pos(unit_width * x, unit_height * y);
                 glm::vec2 size(unit_width, unit_height);
                 GameObject obj(pos, size, ResourceManager::GetTexture("block_solid"), glm::vec3(1.0f, 0.75f, 0.8f));
                 obj.IsBouncy = true;
                 this->Bricks.push_back(obj);
             }
-            else if (tileData[y][x] > 1)	// non-solid; now determine its color based on level data
-            {
+            else if (tileData[y][x] > 1) {
                 glm::vec3 color = glm::vec3(1.0f); // original: white
                 if (tileData[y][x] == 2)
                     color = glm::vec3(0.2f, 0.6f, 1.0f);
