@@ -39,7 +39,7 @@ void Game::Init() {
     ResourceManager::LoadTexture("graphics/pillars_of_creation.jpg", false, "pillars_of_creation");
     ResourceManager::LoadTexture("graphics/ring_nebula.jpg", false, "ring_nebula");
     ResourceManager::LoadTexture("graphics/ball.png", true, "ball");
-    ResourceManager::LoadTexture("graphics/block.png", false, "block");
+    ResourceManager::LoadTexture("graphics/block.jpg", false, "block");
     ResourceManager::LoadTexture("graphics/paddle.png", true, "paddle");
     // load levels
     GameLevel one; one.Load("levels/one.lvl", this->Width, this->Height / 2);

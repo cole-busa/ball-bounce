@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 
 void GameLevel::Load(const char* file, unsigned int levelWidth, unsigned int levelHeight) {
@@ -43,7 +44,8 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
     // calculate dimensions
     unsigned int height = tileData.size();
     unsigned int width = tileData[0].size(); // note we can index vector at [0] since this function is only called if height > 0
-    float unit_width = levelWidth / static_cast<float>(width), unit_height = levelHeight / height;
+    float unit_width = 80;
+    float unit_height = 50;
     // initialize level tiles based on tileData		
     for (unsigned int y = 0; y < height; y++) {
         for (unsigned int x = 0; x < width; x++) {
