@@ -35,8 +35,10 @@ void Game::Init() {
     // set render-specific controls
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
     // load textures
-    ResourceManager::LoadTexture("graphics/background.jpg", false, "background");
-    ResourceManager::LoadTexture("graphics/awesomeface.png", true, "face");
+    ResourceManager::LoadTexture("graphics/crab_nebula.jpg", false, "crab_nebula");
+    ResourceManager::LoadTexture("graphics/pillars_of_creation.jpg", false, "pillars_of_creation");
+    ResourceManager::LoadTexture("graphics/ring_nebula.jpg", false, "ring_nebula");
+    ResourceManager::LoadTexture("graphics/ball.png", true, "ball");
     ResourceManager::LoadTexture("graphics/block.png", false, "block");
     ResourceManager::LoadTexture("graphics/paddle.png", true, "paddle");
     // load levels
@@ -53,7 +55,7 @@ void Game::Init() {
     glm::vec2 playerPos = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
     Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::GetTexture("paddle"));
     glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
-    Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::GetTexture("face"));
+    Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::GetTexture("ball"));
 }
 
 void Game::Update(float dt) {
@@ -101,7 +103,12 @@ void Game::ProcessInput(float dt) {
 void Game::Render() {
     if (this->State == GAME_ACTIVE) {
         // draw background
-        Renderer->DrawSprite(ResourceManager::GetTexture("background"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
+        if (this->Level == 0)
+            Renderer->DrawSprite(ResourceManager::GetTexture("crab_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
+        else if (this->Level == 1)
+            Renderer->DrawSprite(ResourceManager::GetTexture("pillars_of_creation"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
+        else if (this->Level == 2)
+            Renderer->DrawSprite(ResourceManager::GetTexture("ring_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
         // draw level
         this->Levels[this->Level].Draw(*Renderer);
         // draw player
@@ -127,7 +134,7 @@ void Game::ResetPlayer() {
     // reset player/ball stats
     Player->Size = PLAYER_SIZE;
     Player->Position = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
-    Ball = new BallObject(Ball->Position, BALL_RADIUS, Ball->Velocity, ResourceManager::GetTexture("face"));
+    Ball = new BallObject(Ball->Position, BALL_RADIUS, Ball->Velocity, ResourceManager::GetTexture("ball"));
     Ball->Reset(Player->Position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
 }
 
@@ -151,7 +158,7 @@ void Game::DoCollisions() {
                     multiplier = 1.1;
                 //Check if clone
                 if (box.IsEnlarging) {
-                    Ball = new BallObject(Ball->Position, Ball->Radius * 2, Ball->Velocity, ResourceManager::GetTexture("face"));
+                    Ball = new BallObject(Ball->Position, Ball->Radius * 2, Ball->Velocity, ResourceManager::GetTexture("ball"));
                     Ball->Stuck = false;
                 }
 
