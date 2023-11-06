@@ -38,7 +38,6 @@ void Game::Init() {
     ResourceManager::LoadTexture("graphics/background.jpg", false, "background");
     ResourceManager::LoadTexture("graphics/awesomeface.png", true, "face");
     ResourceManager::LoadTexture("graphics/block.png", false, "block");
-    ResourceManager::LoadTexture("graphics/block_solid.png", false, "block_solid");
     ResourceManager::LoadTexture("graphics/paddle.png", true, "paddle");
     // load levels
     GameLevel one; one.Load("levels/one.lvl", this->Width, this->Height / 2);
