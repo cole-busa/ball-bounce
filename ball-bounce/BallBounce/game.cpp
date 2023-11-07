@@ -38,6 +38,7 @@ void Game::Init() {
     ResourceManager::LoadTexture("graphics/crab_nebula.jpg", false, "crab_nebula");
     ResourceManager::LoadTexture("graphics/pillars_of_creation.jpg", false, "pillars_of_creation");
     ResourceManager::LoadTexture("graphics/ring_nebula.jpg", false, "ring_nebula");
+    ResourceManager::LoadTexture("graphics/carina_nebula.jpg", false, "carina_nebula");
     ResourceManager::LoadTexture("graphics/ball.png", true, "ball");
     ResourceManager::LoadTexture("graphics/block.jpg", false, "block");
     ResourceManager::LoadTexture("graphics/paddle.png", true, "paddle");
@@ -97,6 +98,26 @@ void Game::ProcessInput(float dt) {
         if (this->Keys[GLFW_KEY_SPACE]) {
             Ball->Stuck = false;
         }
+        if (this->Keys[GLFW_KEY_1]) {
+            this->Level = 0;
+            this->ResetLevel();
+            this->ResetPlayer();
+        }
+        if (this->Keys[GLFW_KEY_2]) {
+            this->Level = 1;
+            this->ResetLevel();
+            this->ResetPlayer();
+        }
+        if (this->Keys[GLFW_KEY_3]) {
+            this->Level = 2;
+            this->ResetLevel();
+            this->ResetPlayer();
+        }
+        if (this->Keys[GLFW_KEY_4]) {
+            this->Level = 3;
+            this->ResetLevel();
+            this->ResetPlayer();
+        }
     }
 }
 
@@ -109,6 +130,10 @@ void Game::Render() {
             Renderer->DrawSprite(ResourceManager::GetTexture("pillars_of_creation"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
         else if (this->Level == 2)
             Renderer->DrawSprite(ResourceManager::GetTexture("ring_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
+        else if (this->Level == 3)
+            Renderer->DrawSprite(ResourceManager::GetTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
+        else if (this->Level == 4)
+            Renderer->DrawSprite(ResourceManager::GetTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
         // draw level
         this->Levels[this->Level].Draw(*Renderer);
         // draw player
