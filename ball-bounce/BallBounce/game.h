@@ -38,24 +38,24 @@ const float BALL_RADIUS = 25.0f;
 class Game {
     public:
         // game state
-        GameState               State;
-        bool                    Keys[1024];
-        unsigned int            Width, Height;
-        std::vector<GameLevel>  Levels;
-        unsigned int            Level;
+        GameState state;
+        bool keys[1024];
+        unsigned int width, height;
+        std::vector<GameLevel> levels;
+        unsigned int level;
         // constructor/destructor
         Game(unsigned int width, unsigned int height);
         ~Game();
         // initialize game state (load all shaders/textures/levels)
-        void Init();
+        void init();
         // game loop
-        void ProcessInput(float dt);
-        void Update(float dt);
-        void Render();
-        void DoCollisions();
+        void processInput(float dt);
+        void update(float dt);
+        void render();
+        void doCollisions();
         // reset
-        void ResetLevel();
-        void ResetPlayer();
+        void resetLevel();
+        void resetPlayer();
 };
 
 #endif

@@ -15,16 +15,13 @@ const unsigned int SCREEN_WIDTH = 800;
 // The height of the screen
 const unsigned int SCREEN_HEIGHT = 600;
 
-Game Breakout(SCREEN_WIDTH, SCREEN_HEIGHT);
+Game ballBounce(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 int main(int argc, char* argv[]) {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
     glfwWindowHint(GLFW_RESIZABLE, false);
 
     GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Ball Bounce", nullptr, nullptr);
@@ -48,7 +45,7 @@ int main(int argc, char* argv[]) {
 
     // initialize game
     // ---------------
-    Breakout.Init();
+    ballBounce.Init();
 
     // deltaTime variables
     // -------------------
@@ -65,17 +62,17 @@ int main(int argc, char* argv[]) {
 
         // manage user input
         // -----------------
-        Breakout.ProcessInput(deltaTime);
+        ballBounce.ProcessInput(deltaTime);
 
         // update game state
         // -----------------
-        Breakout.Update(deltaTime);
+        ballBounce.Update(deltaTime);
 
         // render
         // ------
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        Breakout.Render();
+        ballBounce.Render();
 
         glfwSwapBuffers(window);
     }
@@ -95,9 +92,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key >= 0 && key < 1024)
     {
         if (action == GLFW_PRESS)
-            Breakout.Keys[key] = true;
+            ballBounce.keys[key] = true;
         else if (action == GLFW_RELEASE)
-            Breakout.Keys[key] = false;
+            ballBounce.keys[key] = false;
     }
 }
 
