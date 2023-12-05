@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 
     // initialize game
     // ---------------
-    ballBounce.Init();
+    ballBounce.init();
 
     // deltaTime variables
     // -------------------
@@ -62,24 +62,24 @@ int main(int argc, char* argv[]) {
 
         // manage user input
         // -----------------
-        ballBounce.ProcessInput(deltaTime);
+        ballBounce.processInput(deltaTime);
 
         // update game state
         // -----------------
-        ballBounce.Update(deltaTime);
+        ballBounce.update(deltaTime);
 
         // render
         // ------
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        ballBounce.Render();
+        ballBounce.render();
 
         glfwSwapBuffers(window);
     }
 
     // delete all resources as loaded using the resource manager
     // ---------------------------------------------------------
-    ResourceManager::Clear();
+    ResourceManager::clear();
 
     glfwTerminate();
     return 0;

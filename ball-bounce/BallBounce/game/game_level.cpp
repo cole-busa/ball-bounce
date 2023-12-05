@@ -5,9 +5,9 @@
 #include <iostream>
 
 
-void GameLevel::Load(const char* file, unsigned int levelWidth, unsigned int levelHeight) {
+void GameLevel::load(const char* file, unsigned int levelWidth, unsigned int levelHeight) {
     // clear old data
-    this->Bricks.clear();
+    this->bricks.clear();
     // load from file
     unsigned int tileCode;
     GameLevel level;
@@ -27,15 +27,15 @@ void GameLevel::Load(const char* file, unsigned int levelWidth, unsigned int lev
     }
 }
 
-void GameLevel::Draw(SpriteRenderer& renderer) {
-    for (GameObject& tile : this->Bricks)
-        if (!tile.Destroyed)
-            tile.Draw(renderer);
+void GameLevel::draw(SpriteRenderer& renderer) {
+    for (GameObject& tile : this->bricks)
+        if (!tile.destroyed)
+            tile.draw(renderer);
 }
 
-bool GameLevel::IsCompleted() {
-    for (GameObject& tile : this->Bricks)
-        if (!tile.IsSolid && !tile.Destroyed)
+bool GameLevel::isCompleted() {
+    for (GameObject& tile : this->bricks)
+        if (!tile.isSolid && !tile.destroyed)
             return false;
     return true;
 }
@@ -53,15 +53,15 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
             if (tileData[y][x] == 1) {
                 glm::vec2 pos(unit_width * x, unit_height * y);
                 glm::vec2 size(unit_width, unit_height);
-                GameObject obj(pos, size, ResourceManager::GetTexture("block"), glm::vec3(1.0f, 0.75f, 0.8f));
-                obj.IsBouncy = true;
-                this->Bricks.push_back(obj);
+                GameObject obj(pos, size, ResourceManager::getTexture("block"), glm::vec3(1.0f, 0.75f, 0.8f));
+                obj.isBouncy = true;
+                this->bricks.push_back(obj);
             } else if (tileData[y][x] == 2) {
                 glm::vec2 pos(unit_width * x, unit_height * y);
                 glm::vec2 size(unit_width, unit_height);
-                GameObject obj(pos, size, ResourceManager::GetTexture("block"), glm::vec3(0.0f, 1.0f, 1.0f));
-                obj.IsEnlarging = true;
-                this->Bricks.push_back(obj);
+                GameObject obj(pos, size, ResourceManager::getTexture("block"), glm::vec3(0.0f, 1.0f, 1.0f));
+                obj.isEnlarging = true;
+                this->bricks.push_back(obj);
             } else if (tileData[y][x] > 2) {
                 glm::vec3 color = glm::vec3(1.0f); // original: white
                 if (tileData[y][x] == 3)
@@ -73,7 +73,7 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
 
                 glm::vec2 pos(unit_width * x, unit_height * y);
                 glm::vec2 size(unit_width, unit_height);
-                this->Bricks.push_back(GameObject(pos, size, ResourceManager::GetTexture("block"), color));
+                this->bricks.push_back(GameObject(pos, size, ResourceManager::getTexture("block"), color));
             }
         }
     }

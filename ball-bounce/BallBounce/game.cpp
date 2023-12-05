@@ -26,27 +26,27 @@ Game::~Game() {
 
 void Game::init() {
     // load shaders
-    ResourceManager::LoadShader("graphics/sprite.vs", "graphics/sprite.fs", nullptr, "sprite");
+    ResourceManager::loadShader("graphics/sprite.vs", "graphics/sprite.fs", nullptr, "sprite");
     // configure shaders
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->width),
         static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
-    ResourceManager::GetShader("sprite").Use().SetInteger("image", 0);
-    ResourceManager::GetShader("sprite").SetMatrix4("projection", projection);
+    ResourceManager::getShader("sprite").Use().setInteger("image", 0);
+    ResourceManager::getShader("sprite").setMatrix4("projection", projection);
     // set render-specific controls
-    renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
+    renderer = new SpriteRenderer(ResourceManager::getShader("sprite"));
     // load textures
-    ResourceManager::LoadTexture("graphics/crab_nebula.jpg", false, "crab_nebula");
-    ResourceManager::LoadTexture("graphics/pillars_of_creation.jpg", false, "pillars_of_creation");
-    ResourceManager::LoadTexture("graphics/ring_nebula.jpg", false, "ring_nebula");
-    ResourceManager::LoadTexture("graphics/carina_nebula.jpg", false, "carina_nebula");
-    ResourceManager::LoadTexture("graphics/ball.png", true, "ball");
-    ResourceManager::LoadTexture("graphics/block.jpg", false, "block");
-    ResourceManager::LoadTexture("graphics/paddle.png", true, "paddle");
+    ResourceManager::loadTexture("graphics/crab_nebula.jpg", false, "crab_nebula");
+    ResourceManager::loadTexture("graphics/pillars_of_creation.jpg", false, "pillars_of_creation");
+    ResourceManager::loadTexture("graphics/ring_nebula.jpg", false, "ring_nebula");
+    ResourceManager::loadTexture("graphics/carina_nebula.jpg", false, "carina_nebula");
+    ResourceManager::loadTexture("graphics/ball.png", true, "ball");
+    ResourceManager::loadTexture("graphics/block.jpg", false, "block");
+    ResourceManager::loadTexture("graphics/paddle.png", true, "paddle");
     // load levels
-    GameLevel one; one.Load("levels/one.lvl", this->width, this->height / 2);
-    GameLevel two; two.Load("levels/two.lvl", this->width, this->height / 2);
-    GameLevel three; three.Load("levels/three.lvl", this->width, this->height / 2);
-    GameLevel four; four.Load("levels/four.lvl", this->width, this->height / 2);
+    GameLevel one; one.load("levels/one.lvl", this->width, this->height / 2);
+    GameLevel two; two.load("levels/two.lvl", this->width, this->height / 2);
+    GameLevel three; three.load("levels/three.lvl", this->width, this->height / 2);
+    GameLevel four; four.load("levels/four.lvl", this->width, this->height / 2);
     this->levels.push_back(one);
     this->levels.push_back(two);
     this->levels.push_back(three);
@@ -54,18 +54,18 @@ void Game::init() {
     this->level = 0;
     // configure game objects
     glm::vec2 playerPos = glm::vec2(this->width / 2.0f - PLAYER_SIZE.x / 2.0f, this->height - PLAYER_SIZE.y);
-    player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::GetTexture("paddle"));
+    player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::getTexture("paddle"));
     glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
-    ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::GetTexture("ball"));
+    ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("ball"));
 }
 
 void Game::update(float dt) {
     // update objects
-    ball->Move(dt, this->width);
+    ball->move(dt, this->width);
     // check for collisions
     this->doCollisions();
     // check loss condition
-    if (ball->Position.y >= this->height) {
+    if (ball->position.y >= this->height) {
         this->resetLevel();
         this->resetPlayer();
     }
@@ -82,21 +82,21 @@ void Game::processInput(float dt) {
         float velocity = PLAYER_VELOCITY * dt;
         // move playerboard
         if (this->keys[GLFW_KEY_A]) {
-            if (player->Position.x >= 0.0f) {
-                player->Position.x -= velocity;
-                if (ball->Stuck)
-                    ball->Position.x -= velocity;
+            if (player->position.x >= 0.0f) {
+                player->position.x -= velocity;
+                if (ball->stuck)
+                    ball->position.x -= velocity;
             }
         }
         if (this->keys[GLFW_KEY_D]) {
-            if (player->Position.x <= this->width - player->Size.x) {
-                player->Position.x += velocity;
-                if (ball->Stuck)
-                    ball->Position.x += velocity;
+            if (player->position.x <= this->width - player->size.x) {
+                player->position.x += velocity;
+                if (ball->stuck)
+                    ball->position.x += velocity;
             }
         }
         if (this->keys[GLFW_KEY_SPACE]) {
-            ball->Stuck = false;
+            ball->stuck = false;
         }
         if (this->keys[GLFW_KEY_1]) {
             this->level = 0;
@@ -125,42 +125,42 @@ void Game::render() {
     if (this->state == GAME_ACTIVE) {
         // draw background
         if (this->level == 0)
-            renderer->DrawSprite(ResourceManager::GetTexture("crab_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
-        else if (this->level == 1)
-            renderer->DrawSprite(ResourceManager::GetTexture("pillars_of_creation"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
+            renderer->drawSprite(ResourceManager::getTexture("crab_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
+        else if (this-level == 1)
+            renderer->drawSprite(ResourceManager::getTexture("pillars_of_creation"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
         else if (this->level == 2)
-            renderer->DrawSprite(ResourceManager::GetTexture("ring_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
+            renderer->drawSprite(ResourceManager::getTexture("ring_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
         else if (this->level == 3)
-            renderer->DrawSprite(ResourceManager::GetTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
+            renderer->drawSprite(ResourceManager::getTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
         else if (this->level == 4)
-            renderer->DrawSprite(ResourceManager::GetTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
+            renderer->drawSprite(ResourceManager::getTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
         // draw level
-        this->levels[this->level].Draw(*renderer);
+        this->levels[this->level].draw(*renderer);
         // draw player
-        player->Draw(*renderer);
+        player->draw(*renderer);
         // draw ball
-        ball->Draw(*renderer);
+        ball->draw(*renderer);
     }
 }
 
 
 void Game::resetLevel() {
     if (this->level == 0)
-        this->levels[0].Load("levels/one.lvl", this->width, this->height / 2);
+        this->levels[0].load("levels/one.lvl", this->width, this->height / 2);
     else if (this->level == 1)
-        this->levels[1].Load("levels/two.lvl", this->width, this->height / 2);
+        this->levels[1].load("levels/two.lvl", this->width, this->height / 2);
     else if (this->level == 2)
-        this->levels[2].Load("levels/three.lvl", this->width, this->height / 2);
+        this->levels[2].load("levels/three.lvl", this->width, this->height / 2);
     else if (this->level == 3)
-        this->levels[3].Load("levels/four.lvl", this->width, this->height / 2);
+        this->levels[3].load("levels/four.lvl", this->width, this->height / 2);
 }
 
 void Game::resetPlayer() {
     // reset player/ball stats
-    player->Size = PLAYER_SIZE;
-    player->Position = glm::vec2(this->width / 2.0f - PLAYER_SIZE.x / 2.0f, this->height - PLAYER_SIZE.y);
-    ball = new BallObject(ball->Position, BALL_RADIUS, ball->Velocity, ResourceManager::GetTexture("ball"));
-    ball->Reset(player->Position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
+    player->size = PLAYER_SIZE;
+    player->position = glm::vec2(this->width / 2.0f - PLAYER_SIZE.x / 2.0f, this->height - PLAYER_SIZE.y);
+    ball = new BallObject(ball->position, BALL_RADIUS, ball->velocity, ResourceManager::getTexture("ball"));
+    ball->reset(player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
 }
 
 // collision detection
@@ -169,68 +169,68 @@ Collision checkCollision(BallObject& one, GameObject& two);
 Direction vectorDirection(glm::vec2 closest);
 
 void Game::doCollisions() {
-    for (GameObject& box : this->levels[this->level].Bricks) {
-        if (!box.Destroyed) {
+    for (GameObject& box : this->levels[this->level].bricks) {
+        if (!box.destroyed) {
             Collision collision = checkCollision(*ball, box);
             if (std::get<0>(collision)) {
                 float multiplier = 1;
 
                 // destroy block if not solid
-                if (!box.IsSolid)
-                    box.Destroyed = true;
+                if (!box.isSolid)
+                    box.destroyed = true;
                 //Check if bouncy
-                if (box.IsBouncy)
+                if (box.isBouncy)
                     multiplier = 1.1;
                 //Check if clone
-                if (box.IsEnlarging) {
-                    ball = new BallObject(ball->Position, ball->Radius * 2, ball->Velocity, ResourceManager::GetTexture("ball"));
-                    ball->Stuck = false;
+                if (box.isEnlarging) {
+                    ball = new BallObject(ball->position, ball->radius * 2, ball->velocity, ResourceManager::getTexture("ball"));
+                    ball->stuck = false;
                 }
 
                 // collision resolution
                 Direction dir = std::get<1>(collision);
                 glm::vec2 diff_vector = std::get<2>(collision);
                 if (dir == LEFT || dir == RIGHT) {
-                    ball->Velocity.x = -multiplier * ball->Velocity.x; // reverse horizontal velocity
+                    ball->velocity.x = -multiplier * ball->velocity.x; // reverse horizontal velocity
                     // relocate
-                    float penetration = ball->Radius - std::abs(diff_vector.x);
+                    float penetration = ball->radius - std::abs(diff_vector.x);
                     if (dir == LEFT)
-                        ball->Position.x += penetration; // move ball to right
+                        ball->position.x += penetration; // move ball to right
                     else
-                        ball->Position.x -= penetration; // move ball to left;
+                        ball->position.x -= penetration; // move ball to left;
                 }
                 else {
-                    ball->Velocity.y = -multiplier * ball->Velocity.y; // reverse vertical velocity
+                    ball->velocity.y = -multiplier * ball->velocity.y; // reverse vertical velocity
                     // relocate
-                    float penetration = ball->Radius - std::abs(diff_vector.y);
+                    float penetration = ball->radius - std::abs(diff_vector.y);
                     if (dir == UP)
-                        ball->Position.y -= penetration; // move ball bback up
+                        ball->position.y -= penetration; // move ball bback up
                     else
-                        ball->Position.y += penetration; // move ball back down
+                        ball->position.y += penetration; // move ball back down
                 }
             }
         }
     }
     // check collisions for player pad (unless stuck)
     Collision result = checkCollision(*ball, *player);
-    if (!ball->Stuck && std::get<0>(result)) {
+    if (!ball->stuck && std::get<0>(result)) {
         // check where it hit the board, and change velocity based on where it hit the board
-        float centerBoard = player->Position.x + player->Size.x / 2.0f;
-        float distance = (ball->Position.x + ball->Radius) - centerBoard;
-        float percentage = distance / (player->Size.x / 2.0f);
+        float centerBoard = player->position.x + player->size.x / 2.0f;
+        float distance = (ball->position.x + ball->radius) - centerBoard;
+        float percentage = distance / (player->size.x / 2.0f);
         // then move accordingly
         float strength = 2.0f;
-        glm::vec2 oldVelocity = ball->Velocity;
-        ball->Velocity.x = INITIAL_BALL_VELOCITY.x * percentage * strength;
-        ball->Velocity = glm::normalize(ball->Velocity) * glm::length(oldVelocity); // keep speed consistent over both axes (multiply by length of old velocity, so total strength is not changed)
+        glm::vec2 oldVelocity = ball->velocity;
+        ball->velocity.x = INITIAL_BALL_VELOCITY.x * percentage * strength;
+        ball->velocity = glm::normalize(ball->velocity) * glm::length(oldVelocity); // keep speed consistent over both axes (multiply by length of old velocity, so total strength is not changed)
         // fix sticky paddle
-        ball->Velocity.y = -1.0f * abs(ball->Velocity.y);
+        ball->velocity.y = -1.0f * abs(ball->velocity.y);
     }
     
     //Check if all blocks are destroyed
     bool won = true;
-    for (GameObject& box : this->levels[this->level].Bricks) {
-        if (!box.Destroyed) {
+    for (GameObject& box : this->levels[this->level].bricks) {
+        if (!box.destroyed) {
             won = false;
         }
     }
@@ -241,21 +241,21 @@ void Game::doCollisions() {
 
 bool checkCollision(GameObject& one, GameObject& two) {
     // collision x-axis?
-    bool collisionX = one.Position.x + one.Size.x >= two.Position.x &&
-        two.Position.x + two.Size.x >= one.Position.x;
+    bool collisionX = one.position.x + one.size.x >= two.position.x &&
+        two.position.x + two.size.x >= one.position.x;
     // collision y-axis?
-    bool collisionY = one.Position.y + one.Size.y >= two.Position.y &&
-        two.Position.y + two.Size.y >= one.Position.y;
+    bool collisionY = one.position.y + one.size.y >= two.position.y &&
+        two.position.y + two.size.y >= one.position.y;
     // collision only if on both axes
     return collisionX && collisionY;
 }
 
 Collision checkCollision(BallObject& one, GameObject& two) {
     // get center point circle first 
-    glm::vec2 center(one.Position + one.Radius);
+    glm::vec2 center(one.position + one.radius);
     // calculate AABB info (center, half-extents)
-    glm::vec2 aabb_half_extents(two.Size.x / 2.0f, two.Size.y / 2.0f);
-    glm::vec2 aabb_center(two.Position.x + aabb_half_extents.x, two.Position.y + aabb_half_extents.y);
+    glm::vec2 aabb_half_extents(two.size.x / 2.0f, two.size.y / 2.0f);
+    glm::vec2 aabb_center(two.position.x + aabb_half_extents.x, two.position.y + aabb_half_extents.y);
     // get difference vector between both centers
     glm::vec2 difference = center - aabb_center;
     glm::vec2 clamped = glm::clamp(difference, -aabb_half_extents, aabb_half_extents);
@@ -264,7 +264,7 @@ Collision checkCollision(BallObject& one, GameObject& two) {
     // now retrieve vector between center circle and closest point AABB and check if length < radius
     difference = closest - center;
 
-    if (glm::length(difference) < one.Radius) // not <= since in that case a collision also occurs when object one exactly touches object two, which they are at the end of each collision resolution stage.
+    if (glm::length(difference) < one.radius) // not <= since in that case a collision also occurs when object one exactly touches object two, which they are at the end of each collision resolution stage.
         return std::make_tuple(true, vectorDirection(difference), difference);
     else
         return std::make_tuple(false, UP, glm::vec2(0.0f, 0.0f));
