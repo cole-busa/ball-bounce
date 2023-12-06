@@ -30,7 +30,7 @@ void Game::init() {
     // configure shaders
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->width),
         static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
-    ResourceManager::getShader("sprite").Use().setInteger("image", 0);
+    ResourceManager::getShader("sprite").use().setInteger("image", 0);
     ResourceManager::getShader("sprite").setMatrix4("projection", projection);
     // set render-specific controls
     renderer = new SpriteRenderer(ResourceManager::getShader("sprite"));
@@ -126,7 +126,7 @@ void Game::render() {
         // draw background
         if (this->level == 0)
             renderer->drawSprite(ResourceManager::getTexture("crab_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
-        else if (this-level == 1)
+        else if (this->level == 1)
             renderer->drawSprite(ResourceManager::getTexture("pillars_of_creation"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
         else if (this->level == 2)
             renderer->drawSprite(ResourceManager::getTexture("ring_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
