@@ -147,6 +147,7 @@
     <ClCompile Include="game\ball_object.cpp" />
     <ClCompile Include="game\game_level.cpp" />
     <ClCompile Include="game\game_object.cpp" />
+    <ClCompile Include="game\multi_ball.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="graphics\resource_manager.cpp" />
     <ClCompile Include="graphics\shader.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="game\ball_object.h" />
     <ClInclude Include="game\game_level.h" />
     <ClInclude Include="game\game_object.h" />
+    <ClInclude Include="game\multi_ball.h" />
     <ClInclude Include="graphics\resource_manager.h" />
     <ClInclude Include="graphics\shader.h" />
     <ClInclude Include="graphics\sprite_renderer.h" />

@@ -3,13 +3,14 @@
 #include "graphics/sprite_renderer.h"
 #include "game/game_object.h"
 #include "game/ball_object.h"
+#include "game/multi_ball.h"
 
 #include <iostream>
 
 // Game-related State data
 SpriteRenderer* renderer;
 GameObject* player;
-BallObject* ball;
+MultiBall* multiBall;
 
 Game::Game(unsigned int width, unsigned int height) {
     this->state = GAME_ACTIVE;
@@ -21,7 +22,7 @@ Game::Game(unsigned int width, unsigned int height) {
 Game::~Game() {
     delete renderer;
     delete player;
-    delete ball;
+    delete multiBall;
 }
 
 void Game::init() {
@@ -56,24 +57,30 @@ void Game::init() {
     glm::vec2 playerPos = glm::vec2(this->width / 2.0f - PLAYER_SIZE.x / 2.0f, this->height - PLAYER_SIZE.y);
     player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::getTexture("paddle"));
     glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
-    ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("ball"));
+    BallObject ball = *new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("ball"));
+    multiBall = new MultiBall(ball);
 }
 
 void Game::update(float dt) {
     // update objects
-    ball->move(dt, this->width);
-    // check for collisions
-    this->doCollisions();
-    // check loss condition
-    if (ball->position.y >= this->height) {
-        this->resetLevel();
-        this->resetPlayer();
-    }
-    if (this->state == GAME_WIN) {
-        this->state = GAME_ACTIVE;
-        this->level = this->level + 1;
-        this->resetLevel();
-        this->resetPlayer();
+    MultiBall::Node* temp = multiBall->head;
+    while (temp) {
+        BallObject* ball = &temp->data;
+        ball->move(dt, this->width);
+        // check for collisions
+        this->doCollisions();
+        // check loss condition
+        if (ball->position.y >= this->height) {
+            this->resetLevel();
+            this->resetPlayer();
+        }
+        if (this->state == GAME_WIN) {
+            this->state = GAME_ACTIVE;
+            this->level = this->level + 1;
+            this->resetLevel();
+            this->resetPlayer();
+        }
+        temp = temp->next;
     }
 }
 
@@ -84,19 +91,36 @@ void Game::processInput(float dt) {
         if (this->keys[GLFW_KEY_A]) {
             if (player->position.x >= 0.0f) {
                 player->position.x -= velocity;
-                if (ball->stuck)
-                    ball->position.x -= velocity;
+
+                MultiBall::Node* temp = multiBall->head;
+                while (temp) {
+                    BallObject* ball = &temp->data;
+                    if (ball->stuck)
+                        ball->position.x -= velocity;
+                    temp = temp->next;
+                }
             }
         }
         if (this->keys[GLFW_KEY_D]) {
             if (player->position.x <= this->width - player->size.x) {
                 player->position.x += velocity;
-                if (ball->stuck)
-                    ball->position.x += velocity;
+
+                MultiBall::Node* temp = multiBall->head;
+                while (temp) {
+                    BallObject* ball = &temp->data;
+                    if (ball->stuck)
+                        ball->position.x += velocity;
+                    temp = temp->next;
+                }
             }
         }
         if (this->keys[GLFW_KEY_SPACE]) {
-            ball->stuck = false;
+            MultiBall::Node* temp = multiBall->head;
+            while (temp) {
+                BallObject* ball = &temp->data;
+                ball->stuck = false;
+                temp = temp->next;
+            }
         }
         if (this->keys[GLFW_KEY_1]) {
             this->level = 0;
@@ -139,7 +163,12 @@ void Game::render() {
         // draw player
         player->draw(*renderer);
         // draw ball
-        ball->draw(*renderer);
+        MultiBall::Node* temp = multiBall->head;
+        while (temp) {
+            BallObject* ball = &temp->data;
+            ball->draw(*renderer);
+            temp = temp->next;
+        }
     }
 }
 
@@ -159,8 +188,13 @@ void Game::resetPlayer() {
     // reset player/ball stats
     player->size = PLAYER_SIZE;
     player->position = glm::vec2(this->width / 2.0f - PLAYER_SIZE.x / 2.0f, this->height - PLAYER_SIZE.y);
-    ball = new BallObject(ball->position, BALL_RADIUS, ball->velocity, ResourceManager::getTexture("ball"));
-    ball->reset(player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
+    MultiBall::Node* temp = multiBall->head;
+    while (temp) {
+        BallObject* ball = &temp->data;
+        ball = new BallObject(ball->position, BALL_RADIUS, ball->velocity, ResourceManager::getTexture("ball"));
+        ball->reset(player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
+        temp = temp->next;
+    }
 }
 
 // collision detection
@@ -171,7 +205,18 @@ Direction vectorDirection(glm::vec2 closest);
 void Game::doCollisions() {
     for (GameObject& box : this->levels[this->level].bricks) {
         if (!box.destroyed) {
-            Collision collision = checkCollision(*ball, box);
+            Collision collision;
+            BallObject* collidedBall = new BallObject();
+            MultiBall::Node* temp = multiBall->head;
+            while (temp) {
+                BallObject* ball = &temp->data;
+                collision = checkCollision(*ball, box);
+                if (std::get<0>(collision)) {
+                    collidedBall = ball;
+                    break;
+                }
+                temp = temp->next;
+            }
             if (std::get<0>(collision)) {
                 float multiplier = 1;
 
@@ -183,48 +228,59 @@ void Game::doCollisions() {
                     multiplier = 1.1;
                 //Check if clone
                 if (box.isEnlarging) {
-                    ball = new BallObject(ball->position, ball->radius * 2, ball->velocity, ResourceManager::getTexture("ball"));
-                    ball->stuck = false;
+                    collidedBall = new BallObject(collidedBall->position, collidedBall->radius * 2, collidedBall->velocity, ResourceManager::getTexture("ball"));
+                    collidedBall->stuck = false;
                 }
 
                 // collision resolution
                 Direction dir = std::get<1>(collision);
                 glm::vec2 diff_vector = std::get<2>(collision);
                 if (dir == LEFT || dir == RIGHT) {
-                    ball->velocity.x = -multiplier * ball->velocity.x; // reverse horizontal velocity
+                    collidedBall->velocity.x = -multiplier * collidedBall->velocity.x; // reverse horizontal velocity
                     // relocate
-                    float penetration = ball->radius - std::abs(diff_vector.x);
+                    float penetration = collidedBall->radius - std::abs(diff_vector.x);
                     if (dir == LEFT)
-                        ball->position.x += penetration; // move ball to right
+                        collidedBall->position.x += penetration; // move ball to right
                     else
-                        ball->position.x -= penetration; // move ball to left;
+                        collidedBall->position.x -= penetration; // move ball to left;
                 }
                 else {
-                    ball->velocity.y = -multiplier * ball->velocity.y; // reverse vertical velocity
+                    collidedBall->velocity.y = -multiplier * collidedBall->velocity.y; // reverse vertical velocity
                     // relocate
-                    float penetration = ball->radius - std::abs(diff_vector.y);
+                    float penetration = collidedBall->radius - std::abs(diff_vector.y);
                     if (dir == UP)
-                        ball->position.y -= penetration; // move ball bback up
+                        collidedBall->position.y -= penetration; // move ball bback up
                     else
-                        ball->position.y += penetration; // move ball back down
+                        collidedBall->position.y += penetration; // move ball back down
                 }
             }
         }
     }
     // check collisions for player pad (unless stuck)
-    Collision result = checkCollision(*ball, *player);
-    if (!ball->stuck && std::get<0>(result)) {
+    Collision result;
+    BallObject* collidedBall = new BallObject();
+    MultiBall::Node* temp = multiBall->head;
+    while (temp) {
+        BallObject* ball = &temp->data;
+        result = checkCollision(*ball, *player);
+        if (!ball->stuck && std::get<0>(result)) {
+            collidedBall = ball;
+            break;
+        }
+        temp = temp->next;
+    }
+    if (!collidedBall->stuck && std::get<0>(result)) {
         // check where it hit the board, and change velocity based on where it hit the board
         float centerBoard = player->position.x + player->size.x / 2.0f;
-        float distance = (ball->position.x + ball->radius) - centerBoard;
+        float distance = (collidedBall->position.x + collidedBall->radius) - centerBoard;
         float percentage = distance / (player->size.x / 2.0f);
         // then move accordingly
         float strength = 2.0f;
-        glm::vec2 oldVelocity = ball->velocity;
-        ball->velocity.x = INITIAL_BALL_VELOCITY.x * percentage * strength;
-        ball->velocity = glm::normalize(ball->velocity) * glm::length(oldVelocity); // keep speed consistent over both axes (multiply by length of old velocity, so total strength is not changed)
+        glm::vec2 oldVelocity = collidedBall->velocity;
+        collidedBall->velocity.x = INITIAL_BALL_VELOCITY.x * percentage * strength;
+        collidedBall->velocity = glm::normalize(collidedBall->velocity) * glm::length(oldVelocity); // keep speed consistent over both axes (multiply by length of old velocity, so total strength is not changed)
         // fix sticky paddle
-        ball->velocity.y = -1.0f * abs(ball->velocity.y);
+        collidedBall->velocity.y = -1.0f * abs(collidedBall->velocity.y);
     }
     
     //Check if all blocks are destroyed
