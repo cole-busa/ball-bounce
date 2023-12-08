@@ -13,7 +13,7 @@ GameObject* player;
 MultiBall* multiBall;
 
 Game::Game(unsigned int width, unsigned int height) {
-    this->state = GAME_ACTIVE;
+    this->state = GAME_MENU;
     this->keys;
     this->width = width;
     this->height = height;
@@ -36,6 +36,7 @@ void Game::init() {
     // set render-specific controls
     renderer = new SpriteRenderer(ResourceManager::getShader("sprite"));
     // load textures
+    ResourceManager::loadTexture("graphics/start_screen.jpg", false, "start_screen");
     ResourceManager::loadTexture("graphics/crab_nebula.jpg", false, "crab_nebula");
     ResourceManager::loadTexture("graphics/pillars_of_creation.jpg", false, "pillars_of_creation");
     ResourceManager::loadTexture("graphics/ring_nebula.jpg", false, "ring_nebula");
@@ -98,7 +99,11 @@ void Game::update(float dt) {
 }
 
 void Game::processInput(float dt) {
-    if (this->state == GAME_ACTIVE) {
+    if (this->state == GAME_MENU) {
+        if (this->keys[GLFW_KEY_SPACE]) {
+            this->state = GAME_ACTIVE;
+        }
+    } else if (this->state == GAME_ACTIVE) {
         float velocity = PLAYER_VELOCITY * dt;
         // move playerboard
         if (this->keys[GLFW_KEY_A]) {
@@ -159,7 +164,9 @@ void Game::processInput(float dt) {
 }
 
 void Game::render() {
-    if (this->state == GAME_ACTIVE) {
+    if (this->state == GAME_MENU) {
+        renderer->drawSprite(ResourceManager::getTexture("start_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
+    } else if (this->state == GAME_ACTIVE) {
         // draw background
         if (this->level == 0)
             renderer->drawSprite(ResourceManager::getTexture("crab_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
@@ -201,13 +208,10 @@ void Game::resetPlayer() {
     // reset player/ball stats
     player->size = PLAYER_SIZE;
     player->position = glm::vec2(this->width / 2.0f - PLAYER_SIZE.x / 2.0f, this->height - PLAYER_SIZE.y);
-    MultiBall::Node* temp = multiBall->head;
-    while (temp) {
-        BallObject& ball = temp->data;
-        ball = *new BallObject((&ball)->position, BALL_RADIUS, (&ball)->velocity, ResourceManager::getTexture("ball"));
-        (&ball)->reset(player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
-        temp = temp->next;
-    }
+    multiBall->head->next = nullptr;
+    BallObject& ball = multiBall->head->data;
+    ball = *new BallObject((&ball)->position, BALL_RADIUS, (&ball)->velocity, ResourceManager::getTexture("ball"));
+    (&ball)->reset(player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
 }
 
 // collision detection
@@ -249,6 +253,7 @@ void Game::doCollisions() {
                 if (box.isCloning) {
                     glm::vec2 ballPos = player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
                     BallObject ball = *new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("ball"));
+                    (&ball)->stuck = false;
                     multiBall->addFront(ball);
                 }
 
