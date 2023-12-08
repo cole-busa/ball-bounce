@@ -62,7 +62,13 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
                 GameObject obj(pos, size, ResourceManager::getTexture("block"), glm::vec3(0.0f, 1.0f, 1.0f));
                 obj.isEnlarging = true;
                 this->bricks.push_back(obj);
-            } else if (tileData[y][x] > 2) {
+            } else if (tileData[y][x] == 3) {
+                glm::vec2 pos(unit_width * x, unit_height * y);
+                glm::vec2 size(unit_width, unit_height);
+                GameObject obj(pos, size, ResourceManager::getTexture("block"), glm::vec3(0.5f, 0.5f, 0.5f));
+                obj.isCloning= true;
+                this->bricks.push_back(obj);
+            } else if (tileData[y][x] > 3) {
                 glm::vec3 color = glm::vec3(1.0f); // original: white
                 if (tileData[y][x] == 3)
                     color = glm::vec3(1.0f, 0.0f, 0.0f);

@@ -21,6 +21,7 @@ class GameObject {
         bool destroyed;
         bool isBouncy;
         bool isEnlarging;
+        bool isCloning;
         // render state
         Texture2D sprite;
         // constructor(s)

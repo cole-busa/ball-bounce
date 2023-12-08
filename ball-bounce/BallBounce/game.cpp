@@ -63,16 +63,28 @@ void Game::init() {
 
 void Game::update(float dt) {
     // update objects
-    MultiBall::Node* temp = multiBall->head;
-    while (temp) {
-        BallObject* ball = &temp->data;
+    MultiBall::Node* current = multiBall->head;
+    MultiBall::Node* previous = nullptr;
+    while (current) {
+        BallObject* ball = &current->data;
         ball->move(dt, this->width);
         // check for collisions
         this->doCollisions();
         // check loss condition
         if (ball->position.y >= this->height) {
-            this->resetLevel();
-            this->resetPlayer();
+            if (!multiBall->head->next) {
+                this->resetLevel();
+                this->resetPlayer();
+                return;
+            }
+
+            if (&multiBall->head->data == ball) {
+                multiBall->head = multiBall->head->next;
+            } else {
+                previous->next = current->next;
+                delete current;
+                break;
+            }
         }
         if (this->state == GAME_WIN) {
             this->state = GAME_ACTIVE;
@@ -80,7 +92,8 @@ void Game::update(float dt) {
             this->resetLevel();
             this->resetPlayer();
         }
-        temp = temp->next;
+        previous = current;
+        current = current->next;
     }
 }
 
@@ -190,9 +203,9 @@ void Game::resetPlayer() {
     player->position = glm::vec2(this->width / 2.0f - PLAYER_SIZE.x / 2.0f, this->height - PLAYER_SIZE.y);
     MultiBall::Node* temp = multiBall->head;
     while (temp) {
-        BallObject* ball = &temp->data;
-        temp->data = *new BallObject((&temp->data)->position, BALL_RADIUS, (&temp->data)->velocity, ResourceManager::getTexture("ball"));
-        ball->reset(player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
+        BallObject& ball = temp->data;
+        ball = *new BallObject((&ball)->position, BALL_RADIUS, (&ball)->velocity, ResourceManager::getTexture("ball"));
+        (&ball)->reset(player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
         temp = temp->next;
     }
 }
@@ -226,11 +239,17 @@ void Game::doCollisions() {
                 //Check if bouncy
                 if (box.isBouncy)
                     multiplier = 1.1;
-                //Check if clone
+                //Check if enlarging
                 if (box.isEnlarging) {
                     BallObject& collidedBallReference = *collidedBall;
                     collidedBallReference = *new BallObject(collidedBall->position, collidedBall->radius * 2, collidedBall->velocity, ResourceManager::getTexture("ball"));
                     collidedBall->stuck = false;
+                }
+                //Check if cloning
+                if (box.isCloning) {
+                    glm::vec2 ballPos = player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
+                    BallObject ball = *new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("ball"));
+                    multiBall->addFront(ball);
                 }
 
                 // collision resolution

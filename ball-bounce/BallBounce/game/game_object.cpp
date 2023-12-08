@@ -12,6 +12,7 @@ GameObject::GameObject() {
     this->destroyed = false;
     this->isBouncy = false;
     this->isEnlarging = false;
+    this->isCloning = false;
 }
 
 GameObject::GameObject(glm::vec2 pos, glm::vec2 size, Texture2D sprite, glm::vec3 color, glm::vec2 velocity) { 
@@ -25,6 +26,7 @@ GameObject::GameObject(glm::vec2 pos, glm::vec2 size, Texture2D sprite, glm::vec
     this->destroyed = false;
     this->isBouncy = false;
     this->isEnlarging = false;
+    this->isCloning = false;
 }
 
 void GameObject::draw(SpriteRenderer& renderer) {
