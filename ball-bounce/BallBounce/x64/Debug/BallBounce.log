@@ -1,4 +1,4 @@
 ﻿  game.cpp
-C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game.cpp(245,37): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game.cpp(241,37): warning C4305: '=': truncation from 'double' to 'float'
 LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   BallBounce.vcxproj -> C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\x64\Debug\BallBounce.exe

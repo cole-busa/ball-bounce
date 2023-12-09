@@ -87,12 +87,6 @@ void Game::update(float dt) {
                 break;
             }
         }
-        if (this->state == GAME_WIN) {
-            this->state = GAME_ACTIVE;
-            this->level = this->level + 1;
-            this->resetLevel();
-            this->resetPlayer();
-        }
         previous = current;
         current = current->next;
     }
@@ -189,6 +183,8 @@ void Game::render() {
             ball->draw(*renderer);
             temp = temp->next;
         }
+    } else {
+        renderer->drawSprite(ResourceManager::getTexture("start_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
     }
 }
 
@@ -316,7 +312,13 @@ void Game::doCollisions() {
         }
     }
     if (won) {
-        this->state = GAME_WIN;
+        if (this->level == 3) {
+            this->state = GAME_WIN;
+            return;
+        }
+        this->level = this->level + 1;
+        this->resetLevel();
+        this->resetPlayer();
     }
 }
 
