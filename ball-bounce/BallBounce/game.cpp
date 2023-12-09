@@ -37,6 +37,7 @@ void Game::init() {
     renderer = new SpriteRenderer(ResourceManager::getShader("sprite"));
     // load textures
     ResourceManager::loadTexture("graphics/start_screen.jpg", false, "start_screen");
+    ResourceManager::loadTexture("graphics/win_screen.jpg", false, "win_screen");
     ResourceManager::loadTexture("graphics/crab_nebula.jpg", false, "crab_nebula");
     ResourceManager::loadTexture("graphics/pillars_of_creation.jpg", false, "pillars_of_creation");
     ResourceManager::loadTexture("graphics/ring_nebula.jpg", false, "ring_nebula");
@@ -154,6 +155,9 @@ void Game::processInput(float dt) {
             this->resetLevel();
             this->resetPlayer();
         }
+        if (this->keys[GLFW_KEY_5]) {
+            this->state = GAME_WIN;
+        }
     }
 }
 
@@ -184,7 +188,7 @@ void Game::render() {
             temp = temp->next;
         }
     } else {
-        renderer->drawSprite(ResourceManager::getTexture("start_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
+        renderer->drawSprite(ResourceManager::getTexture("win_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
     }
 }
 
