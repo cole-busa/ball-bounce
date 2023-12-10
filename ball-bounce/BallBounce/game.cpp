@@ -7,57 +7,71 @@
 
 #include <iostream>
 
-// Game-related State data
+//Game variables.
 SpriteRenderer* renderer;
 GameObject* player;
 MultiBall* multiBall;
 
+//Constructor for a Game with screen width and height.
 Game::Game(unsigned int width, unsigned int height) {
-    this->state = GAME_MENU;
-    this->keys;
+    state = GAME_MENU;
     this->width = width;
     this->height = height;
 }
 
+//Deconstructor for a Game where all variables are deleted.
 Game::~Game() {
     delete renderer;
     delete player;
     delete multiBall;
 }
 
+//Initialization function for Game variables and textures.
 void Game::init() {
-    // load shaders
+    //Load shader files.
     ResourceManager::loadShader("graphics/sprite.vs", "graphics/sprite.fs", nullptr, "sprite");
-    // configure shaders
+
+    //Set shader settings.
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->width),
         static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
     ResourceManager::getShader("sprite").use().setInteger("image", 0);
     ResourceManager::getShader("sprite").setMatrix4("projection", projection);
-    // set render-specific controls
+
+    //Intialize renderer with shaders.
     renderer = new SpriteRenderer(ResourceManager::getShader("sprite"));
-    // load textures
+
+
+    //Load textures:
+    //Start and end screen.
     ResourceManager::loadTexture("graphics/start_screen.jpg", false, "start_screen");
     ResourceManager::loadTexture("graphics/win_screen.jpg", false, "win_screen");
+
+    //Level backgrounds.
     ResourceManager::loadTexture("graphics/crab_nebula.jpg", false, "crab_nebula");
     ResourceManager::loadTexture("graphics/pillars_of_creation.jpg", false, "pillars_of_creation");
     ResourceManager::loadTexture("graphics/ring_nebula.jpg", false, "ring_nebula");
     ResourceManager::loadTexture("graphics/carina_nebula.jpg", false, "carina_nebula");
+
+    //Game objects.
     ResourceManager::loadTexture("graphics/ball.png", true, "ball");
     ResourceManager::loadTexture("graphics/block.jpg", false, "block");
     ResourceManager::loadTexture("graphics/paddle.png", true, "paddle");
-    // load levels
-    GameLevel one; one.load("levels/one.lvl", this->width, this->height / 2);
-    GameLevel two; two.load("levels/two.lvl", this->width, this->height / 2);
-    GameLevel three; three.load("levels/three.lvl", this->width, this->height / 2);
-    GameLevel four; four.load("levels/four.lvl", this->width, this->height / 2);
-    this->levels.push_back(one);
-    this->levels.push_back(two);
-    this->levels.push_back(three);
-    this->levels.push_back(four);
-    this->level = 0;
-    // configure game objects
+
+    //Load levels.
+    GameLevel* one = new GameLevel("levels/one.lvl", this->width, this->height / 2);
+    GameLevel* two = new GameLevel("levels/two.lvl", this->width, this->height / 2);
+    GameLevel* three = new GameLevel("levels/three.lvl", this->width, this->height / 2);
+    GameLevel* four = new GameLevel("levels/four.lvl", this->width, this->height / 2);
+    levels.push_back(*one);
+    levels.push_back(*two);
+    levels.push_back(*three);
+    levels.push_back(*four);
+    level = 0;
+
+    //Create game objects.
     glm::vec2 playerPos = glm::vec2(this->width / 2.0f - PLAYER_SIZE.x / 2.0f, this->height - PLAYER_SIZE.y);
     player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::getTexture("paddle"));
+
     glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
     BallObject ball = *new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("ball"));
     multiBall = new MultiBall(ball);
@@ -194,14 +208,20 @@ void Game::render() {
 
 
 void Game::resetLevel() {
-    if (this->level == 0)
-        this->levels[0].load("levels/one.lvl", this->width, this->height / 2);
-    else if (this->level == 1)
-        this->levels[1].load("levels/two.lvl", this->width, this->height / 2);
-    else if (this->level == 2)
-        this->levels[2].load("levels/three.lvl", this->width, this->height / 2);
-    else if (this->level == 3)
-        this->levels[3].load("levels/four.lvl", this->width, this->height / 2);
+    switch (level) {
+        case 0:
+            levels[0] = *new GameLevel("levels/one.lvl", this->width, this->height / 2);
+            break;
+        case 1:
+            levels[1] = *new GameLevel("levels/two.lvl", this->width, this->height / 2);
+            break;
+        case 2:
+            levels[2] = *new GameLevel("levels/three.lvl", this->width, this->height / 2);
+            break;
+        case 3:
+            levels[3] = *new GameLevel("levels/four.lvl", this->width, this->height / 2);
+            break;
+    }
 }
 
 void Game::resetPlayer() {

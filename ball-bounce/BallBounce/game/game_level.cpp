@@ -5,12 +5,11 @@
 #include <iostream>
 
 
-void GameLevel::load(const char* file, unsigned int levelWidth, unsigned int levelHeight) {
+GameLevel::GameLevel(const char* file, unsigned int levelWidth, unsigned int levelHeight) {
     // clear old data
     this->bricks.clear();
     // load from file
     unsigned int tileCode;
-    GameLevel level;
     std::string line;
     std::ifstream fstream(file);
     std::vector<std::vector<unsigned int>> tileData;

@@ -17,9 +17,7 @@ class GameLevel {
         // level state
         std::vector<GameObject> bricks;
         // constructor
-        GameLevel() { }
-        // loads level from file
-        void load(const char* file, unsigned int levelWidth, unsigned int levelHeight);
+        GameLevel(const char* file, unsigned int levelWidth, unsigned int levelHeight);
         // render level
         void draw(SpriteRenderer& renderer);
         // check if the level is completed (all non-solid tiles are destroyed)
