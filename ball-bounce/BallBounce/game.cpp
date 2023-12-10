@@ -32,8 +32,8 @@ void Game::init() {
     ResourceManager::loadShader("graphics/sprite.vs", "graphics/sprite.fs", nullptr, "sprite");
 
     //Set shader settings.
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->width),
-        static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
+    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(width),
+        static_cast<float>(height), 0.0f, -1.0f, 1.0f);
     ResourceManager::getShader("sprite").use().setInteger("image", 0);
     ResourceManager::getShader("sprite").setMatrix4("projection", projection);
 
@@ -58,10 +58,10 @@ void Game::init() {
     ResourceManager::loadTexture("graphics/paddle.png", true, "paddle");
 
     //Load levels.
-    GameLevel* one = new GameLevel("levels/one.lvl", this->width, this->height / 2);
-    GameLevel* two = new GameLevel("levels/two.lvl", this->width, this->height / 2);
-    GameLevel* three = new GameLevel("levels/three.lvl", this->width, this->height / 2);
-    GameLevel* four = new GameLevel("levels/four.lvl", this->width, this->height / 2);
+    GameLevel* one = new GameLevel("levels/one.lvl", width, height / 2);
+    GameLevel* two = new GameLevel("levels/two.lvl", width, height / 2);
+    GameLevel* three = new GameLevel("levels/three.lvl", width, height / 2);
+    GameLevel* four = new GameLevel("levels/four.lvl", width, height / 2);
     levels.push_back(*one);
     levels.push_back(*two);
     levels.push_back(*three);
@@ -69,7 +69,7 @@ void Game::init() {
     level = 0;
 
     //Create game objects.
-    glm::vec2 playerPos = glm::vec2(this->width / 2.0f - PLAYER_SIZE.x / 2.0f, this->height - PLAYER_SIZE.y);
+    glm::vec2 playerPos = glm::vec2(width / 2.0f - PLAYER_SIZE.x / 2.0f, height - PLAYER_SIZE.y);
     player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::getTexture("paddle"));
 
     glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
@@ -77,26 +77,31 @@ void Game::init() {
     multiBall = new MultiBall(ball);
 }
 
+//Update function that runs each frame.
 void Game::update(float dt) {
-    // update objects
+    //Update the balls within the MultiBall object.
     MultiBall::Node* current = multiBall->head;
     MultiBall::Node* previous = nullptr;
     while (current) {
         BallObject* ball = &current->data;
-        ball->move(dt, this->width);
-        // check for collisions
-        this->doCollisions();
-        // check loss condition
-        if (ball->position.y >= this->height) {
+        //Move each ball.
+        ball->move(dt, width);
+        //Check each ball for collisions.
+        doCollisions();
+        //Check if the ball has exited the playzone.
+        if (ball->position.y >= height) {
             if (!multiBall->head->next) {
-                this->resetLevel();
-                this->resetPlayer();
+                //If the ball is the only ball, reset the level.
+                resetLevel();
+                resetPlayer();
                 return;
             }
 
             if (&multiBall->head->data == ball) {
+                //If the ball is the head, set the head to the next ball.
                 multiBall->head = multiBall->head->next;
             } else {
+                //Otherwise, remove the middle ball and set the previous ball's next to the current's next.
                 previous->next = current->next;
                 delete current;
                 break;
@@ -107,15 +112,17 @@ void Game::update(float dt) {
     }
 }
 
+//Function to process user input depending on game states.
 void Game::processInput(float dt) {
-    if (this->state == GAME_MENU) {
-        if (this->keys[GLFW_KEY_SPACE]) {
-            this->state = GAME_ACTIVE;
+    if (state == GAME_MENU) {
+        //In the start menu, we only check if the user presses space.
+        if (keys[GLFW_KEY_SPACE]) {
+            state = GAME_ACTIVE;
         }
-    } else if (this->state == GAME_ACTIVE) {
+    } else if (state == GAME_ACTIVE) {
+        //If the state is active, we want to check moving the paddle left and right, unsticking the ball, and changing the level.
         float velocity = PLAYER_VELOCITY * dt;
-        // move playerboard
-        if (this->keys[GLFW_KEY_A]) {
+        if (keys[GLFW_KEY_A]) {
             if (player->position.x >= 0.0f) {
                 player->position.x -= velocity;
 
@@ -128,8 +135,8 @@ void Game::processInput(float dt) {
                 }
             }
         }
-        if (this->keys[GLFW_KEY_D]) {
-            if (player->position.x <= this->width - player->size.x) {
+        if (keys[GLFW_KEY_D]) {
+            if (player->position.x <= width - player->size.x) {
                 player->position.x += velocity;
 
                 MultiBall::Node* temp = multiBall->head;
@@ -141,7 +148,7 @@ void Game::processInput(float dt) {
                 }
             }
         }
-        if (this->keys[GLFW_KEY_SPACE]) {
+        if (keys[GLFW_KEY_SPACE]) {
             MultiBall::Node* temp = multiBall->head;
             while (temp) {
                 BallObject* ball = &temp->data;
@@ -149,49 +156,49 @@ void Game::processInput(float dt) {
                 temp = temp->next;
             }
         }
-        if (this->keys[GLFW_KEY_1]) {
-            this->level = 0;
-            this->resetLevel();
-            this->resetPlayer();
+        if (keys[GLFW_KEY_1]) {
+            level = 0;
+            resetLevel();
+            resetPlayer();
         }
-        if (this->keys[GLFW_KEY_2]) {
-            this->level = 1;
-            this->resetLevel();
-            this->resetPlayer();
+        if (keys[GLFW_KEY_2]) {
+            level = 1;
+            resetLevel();
+            resetPlayer();
         }
-        if (this->keys[GLFW_KEY_3]) {
-            this->level = 2;
-            this->resetLevel();
-            this->resetPlayer();
+        if (keys[GLFW_KEY_3]) {
+            level = 2;
+            resetLevel();
+            resetPlayer();
         }
-        if (this->keys[GLFW_KEY_4]) {
-            this->level = 3;
-            this->resetLevel();
-            this->resetPlayer();
+        if (keys[GLFW_KEY_4]) {
+            level = 3;
+            resetLevel();
+            resetPlayer();
         }
-        if (this->keys[GLFW_KEY_5]) {
-            this->state = GAME_WIN;
+        if (keys[GLFW_KEY_5]) {
+            state = GAME_WIN;
         }
     }
 }
 
 void Game::render() {
-    if (this->state == GAME_MENU) {
-        renderer->drawSprite(ResourceManager::getTexture("start_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
-    } else if (this->state == GAME_ACTIVE) {
+    if (state == GAME_MENU) {
+        renderer->drawSprite(ResourceManager::getTexture("start_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+    } else if (state == GAME_ACTIVE) {
         // draw background
-        if (this->level == 0)
-            renderer->drawSprite(ResourceManager::getTexture("crab_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
-        else if (this->level == 1)
-            renderer->drawSprite(ResourceManager::getTexture("pillars_of_creation"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
-        else if (this->level == 2)
-            renderer->drawSprite(ResourceManager::getTexture("ring_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
-        else if (this->level == 3)
-            renderer->drawSprite(ResourceManager::getTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
-        else if (this->level == 4)
-            renderer->drawSprite(ResourceManager::getTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
+        if (level == 0)
+            renderer->drawSprite(ResourceManager::getTexture("crab_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+        else if (level == 1)
+            renderer->drawSprite(ResourceManager::getTexture("pillars_of_creation"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+        else if (level == 2)
+            renderer->drawSprite(ResourceManager::getTexture("ring_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+        else if (level == 3)
+            renderer->drawSprite(ResourceManager::getTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+        else if (level == 4)
+            renderer->drawSprite(ResourceManager::getTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
         // draw level
-        this->levels[this->level].draw(*renderer);
+        levels[level].draw(*renderer);
         // draw player
         player->draw(*renderer);
         // draw ball
@@ -202,7 +209,7 @@ void Game::render() {
             temp = temp->next;
         }
     } else {
-        renderer->drawSprite(ResourceManager::getTexture("win_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
+        renderer->drawSprite(ResourceManager::getTexture("win_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
     }
 }
 
@@ -210,16 +217,16 @@ void Game::render() {
 void Game::resetLevel() {
     switch (level) {
         case 0:
-            levels[0] = *new GameLevel("levels/one.lvl", this->width, this->height / 2);
+            levels[0] = *new GameLevel("levels/one.lvl", width, height / 2);
             break;
         case 1:
-            levels[1] = *new GameLevel("levels/two.lvl", this->width, this->height / 2);
+            levels[1] = *new GameLevel("levels/two.lvl", width, height / 2);
             break;
         case 2:
-            levels[2] = *new GameLevel("levels/three.lvl", this->width, this->height / 2);
+            levels[2] = *new GameLevel("levels/three.lvl", width, height / 2);
             break;
         case 3:
-            levels[3] = *new GameLevel("levels/four.lvl", this->width, this->height / 2);
+            levels[3] = *new GameLevel("levels/four.lvl", width, height / 2);
             break;
     }
 }
@@ -227,7 +234,7 @@ void Game::resetLevel() {
 void Game::resetPlayer() {
     // reset player/ball stats
     player->size = PLAYER_SIZE;
-    player->position = glm::vec2(this->width / 2.0f - PLAYER_SIZE.x / 2.0f, this->height - PLAYER_SIZE.y);
+    player->position = glm::vec2(width / 2.0f - PLAYER_SIZE.x / 2.0f, height - PLAYER_SIZE.y);
     multiBall->head->next = nullptr;
     BallObject& ball = multiBall->head->data;
     ball = *new BallObject((&ball)->position, BALL_RADIUS, (&ball)->velocity, ResourceManager::getTexture("ball"));
@@ -240,7 +247,7 @@ Collision checkCollision(BallObject& one, GameObject& two);
 Direction vectorDirection(glm::vec2 closest);
 
 void Game::doCollisions() {
-    for (GameObject& box : this->levels[this->level].bricks) {
+    for (GameObject& box : levels[level].bricks) {
         if (!box.destroyed) {
             Collision collision;
             BallObject* collidedBall = new BallObject();
@@ -330,19 +337,19 @@ void Game::doCollisions() {
     
     //Check if all blocks are destroyed
     bool won = true;
-    for (GameObject& box : this->levels[this->level].bricks) {
+    for (GameObject& box : levels[level].bricks) {
         if (!box.destroyed) {
             won = false;
         }
     }
     if (won) {
-        if (this->level == 3) {
-            this->state = GAME_WIN;
+        if (level == 3) {
+            state = GAME_WIN;
             return;
         }
-        this->level = this->level + 1;
-        this->resetLevel();
-        this->resetPlayer();
+        level = level + 1;
+        resetLevel();
+        resetPlayer();
     }
 }
 
