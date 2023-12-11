@@ -1,35 +1,35 @@
 #include "multi_ball.h"
 
-MultiBall::MultiBall() : head(nullptr), size(0) {}\
+//Default constructor.
+MultiBall::MultiBall() {
+	head = nullptr;
+}
 
+//Constructor with a single BallObject.
 MultiBall::MultiBall(BallObject& data) {
 	Node* newNode = new Node{data, head};
 	head = newNode;
-	size = 1;
 }
 
+//Destructor.
 MultiBall::~MultiBall() {
 	while (head) {
 		Node* toDelete = head;
 		head = head->next;
 		delete toDelete;
 	}
-	size = 0;
 }
 
+//Function to add a BallObject to the front of the linked list.
 void MultiBall::addFront(BallObject& data) {
-	Node* newNode = new Node{ data, nullptr };
+	Node* newNode = new Node{data, nullptr};
 	if (head) {
 		newNode->next = head;
 	}
 	head = newNode;
-	size++;
 }
 
+// Function to check if the linked list is empty.
 bool MultiBall::isEmpty() { 
 	return head == nullptr; 
-}
-
-int MultiBall::getSize() { 
-	return size; 
 }

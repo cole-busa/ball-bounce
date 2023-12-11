@@ -7,54 +7,65 @@
 #include "game/game_level.h"
 #include "game/ball_object.h"
 
-// Represents the current state of the game
+//Enum for the current game state. Active is the playing state, start is the start screen, and win is the win screen.
 enum GameState {
     GAME_ACTIVE,
     GAME_START,
     GAME_WIN
 };
 
-// Represents the four possible (collision) directions
+//Enum for the directions a collision can take.
 enum Direction {
     UP,
     RIGHT,
     DOWN,
     LEFT
 };
-// Defines a Collision typedef that represents collision data
-typedef std::tuple<bool, Direction, glm::vec2> Collision; // <collision?, what direction?, difference vector center - closest point>
+//Collision type that contains if a collision happened, the direction it happened in, and the size of the collision.
+typedef std::tuple<bool, Direction, glm::vec2> Collision;
 
-// Initial size of the player paddle
+//Size of the paddle.
 const glm::vec2 PADDLE_SIZE(150.0f, 20.0f);
-// Initial velocity of the player paddle
+//Velocity of the paddle.
 const float PADDLE_VELOCITY(500.0f);
-// Initial velocity of the Ball
+//Starting velocity of the ball.
 const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
-// Radius of the ball object
+//Starting radius of the ball.
 const float BALL_RADIUS = 25.0f;
 
-// Game holds all game-related state and functionality.
-// Combines all game-related data into a single class for
-// easy access to each of the components and manageability.
+// Game contains all methods for the functionality of the game.
 class Game {
     public:
-        // game state
+        //Game state.
         GameState state;
+
+        //Array for the inputs a player can give.
         bool keys[1024];
+
+        //Width and height of the screen.
         unsigned int width, height;
+
+        //Contains brick level data.
         std::vector<GameLevel> levels;
+
+        //Level that the player is on.
         unsigned int level;
-        // constructor/destructor
+
+        //Constructor and destructor.
         Game(unsigned int width, unsigned int height);
         ~Game();
-        // initialize game state (load all shaders/textures/levels)
+
+        //Initialization function.
         void init();
-        // game loop
+
+        //Input processing function.
         void processInput(float dt);
+
+        //Update and render functions.
         void update(float dt);
         void render();
         
-        // reset
+        //Reset functions.
         void resetLevel();
         void resetGameObjects();
 

@@ -19,7 +19,7 @@ Game::Game(unsigned int width, unsigned int height) {
     this->height = height;
 }
 
-//Deconstructor for a Game where all variables are deleted.
+//Destructor for a Game where all variables are deleted.
 Game::~Game() {
     delete renderer;
     delete paddle;
