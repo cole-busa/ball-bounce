@@ -9,12 +9,12 @@
 
 //Game variables.
 SpriteRenderer* renderer;
-GameObject* player;
+GameObject* paddle;
 MultiBall* multiBall;
 
 //Constructor for a Game with screen width and height.
 Game::Game(unsigned int width, unsigned int height) {
-    state = GAME_MENU;
+    state = GAME_START;
     this->width = width;
     this->height = height;
 }
@@ -22,7 +22,7 @@ Game::Game(unsigned int width, unsigned int height) {
 //Deconstructor for a Game where all variables are deleted.
 Game::~Game() {
     delete renderer;
-    delete player;
+    delete paddle;
     delete multiBall;
 }
 
@@ -69,10 +69,10 @@ void Game::init() {
     level = 0;
 
     //Create game objects.
-    glm::vec2 playerPos = glm::vec2(width / 2.0f - PLAYER_SIZE.x / 2.0f, height - PLAYER_SIZE.y);
-    player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::getTexture("paddle"));
+    glm::vec2 paddlePos = glm::vec2(width / 2.0f - PADDLE_SIZE.x / 2.0f, height - PADDLE_SIZE.y);
+    paddle = new GameObject(paddlePos, PADDLE_SIZE, ResourceManager::getTexture("paddle"));
 
-    glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
+    glm::vec2 ballPos = paddlePos + glm::vec2(PADDLE_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
     BallObject ball = *new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("ball"));
     multiBall = new MultiBall(ball);
 }
@@ -87,13 +87,13 @@ void Game::update(float dt) {
         //Move each ball.
         ball->move(dt, width);
         //Check each ball for collisions.
-        doCollisions();
+        handleCollisions();
         //Check if the ball has exited the playzone.
         if (ball->position.y >= height) {
             if (!multiBall->head->next) {
                 //If the ball is the only ball, reset the level.
                 resetLevel();
-                resetPlayer();
+                resetGameObjects();
                 return;
             }
 
@@ -114,107 +114,150 @@ void Game::update(float dt) {
 
 //Function to process user input depending on game states.
 void Game::processInput(float dt) {
-    if (state == GAME_MENU) {
-        //In the start menu, we only check if the user presses space.
+    if (state == GAME_START) {
+        //In the start state, we only check if the user presses space and start the game if they do.
         if (keys[GLFW_KEY_SPACE]) {
             state = GAME_ACTIVE;
         }
     } else if (state == GAME_ACTIVE) {
         //If the state is active, we want to check moving the paddle left and right, unsticking the ball, and changing the level.
-        float velocity = PLAYER_VELOCITY * dt;
-        if (keys[GLFW_KEY_A]) {
-            if (player->position.x >= 0.0f) {
-                player->position.x -= velocity;
+        //Velocity is useful for updating the paddle and stuck ball positions.
+        float velocity = PADDLE_VELOCITY * dt;
 
-                MultiBall::Node* temp = multiBall->head;
-                while (temp) {
-                    BallObject* ball = &temp->data;
+        //If the player inputs the A key, we want to move the paddle left.
+        if (keys[GLFW_KEY_A]) {
+            if (paddle->position.x >= 0.0f) {
+                //If the paddle is not at the left wall, move it left.
+                paddle->position.x -= velocity;
+
+                //Check if there are any balls stuck to the paddle so we can move those left too.
+                MultiBall::Node* iterator = multiBall->head;
+                while (iterator) {
+                    BallObject* ball = &iterator->data;
                     if (ball->stuck)
                         ball->position.x -= velocity;
-                    temp = temp->next;
+                    iterator = iterator->next;
                 }
             }
         }
-        if (keys[GLFW_KEY_D]) {
-            if (player->position.x <= width - player->size.x) {
-                player->position.x += velocity;
 
-                MultiBall::Node* temp = multiBall->head;
-                while (temp) {
-                    BallObject* ball = &temp->data;
+        //If the player inputs the D key, we want to move the paddle right.
+        if (keys[GLFW_KEY_D]) {
+            if (paddle->position.x <= width - paddle->size.x) {
+                //If the paddle is not at the right wall, move it right.
+                paddle->position.x += velocity;
+
+                //Check if there are any balls stuck to the paddle so we can move those right too.
+                MultiBall::Node* iterator = multiBall->head;
+                while (iterator) {
+                    BallObject* ball = &iterator->data;
                     if (ball->stuck)
                         ball->position.x += velocity;
-                    temp = temp->next;
+                    iterator = iterator->next;
                 }
             }
         }
+
+        //If the player inputs the Space key, we want to unstick any balls on the paddle.
         if (keys[GLFW_KEY_SPACE]) {
-            MultiBall::Node* temp = multiBall->head;
-            while (temp) {
-                BallObject* ball = &temp->data;
+            MultiBall::Node* iterator = multiBall->head;
+            while (iterator) {
+                BallObject* ball = &iterator->data;
                 ball->stuck = false;
-                temp = temp->next;
+                iterator = iterator->next;
             }
         }
+
+        //If the player inputs the 1 key, we want to go to the first level. This is both for convenience and testing purposes.
         if (keys[GLFW_KEY_1]) {
             level = 0;
             resetLevel();
-            resetPlayer();
+            resetGameObjects();
         }
+
+        //If the player inputs the 2 key, we want to go to the second level. This is both for convenience and testing purposes.
         if (keys[GLFW_KEY_2]) {
             level = 1;
             resetLevel();
-            resetPlayer();
+            resetGameObjects();
         }
+
+        //If the player inputs the 3 key, we want to go to the third level. This is both for convenience and testing purposes.
         if (keys[GLFW_KEY_3]) {
             level = 2;
             resetLevel();
-            resetPlayer();
+            resetGameObjects();
         }
+
+        //If the player inputs the 4 key, we want to go to the fourth level. This is both for convenience and testing purposes.
         if (keys[GLFW_KEY_4]) {
             level = 3;
             resetLevel();
-            resetPlayer();
+            resetGameObjects();
         }
+
+        //If the player inputs the 5 key, we want to go to the win screen. This is for testing purposes.
         if (keys[GLFW_KEY_5]) {
             state = GAME_WIN;
         }
     }
 }
 
+//Rendering function for drawing the background, the level blocks, the paddle, and the balls.
 void Game::render() {
-    if (state == GAME_MENU) {
-        renderer->drawSprite(ResourceManager::getTexture("start_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-    } else if (state == GAME_ACTIVE) {
-        // draw background
-        if (level == 0)
-            renderer->drawSprite(ResourceManager::getTexture("crab_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-        else if (level == 1)
-            renderer->drawSprite(ResourceManager::getTexture("pillars_of_creation"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-        else if (level == 2)
-            renderer->drawSprite(ResourceManager::getTexture("ring_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-        else if (level == 3)
-            renderer->drawSprite(ResourceManager::getTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-        else if (level == 4)
-            renderer->drawSprite(ResourceManager::getTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-        // draw level
-        levels[level].draw(*renderer);
-        // draw player
-        player->draw(*renderer);
-        // draw ball
-        MultiBall::Node* temp = multiBall->head;
-        while (temp) {
-            BallObject* ball = &temp->data;
-            ball->draw(*renderer);
-            temp = temp->next;
-        }
-    } else {
-        renderer->drawSprite(ResourceManager::getTexture("win_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+    //Iterator for rendering each Ball in the MultiBall.
+    MultiBall::Node* iterator = multiBall->head;
+
+    //Switch based on the state enum value.
+    switch (state) {
+        case GAME_ACTIVE:
+            //In the case of an active game, we want to draw the right background, the level blocks, the paddle, and the balls.
+            switch (level) {
+                case 0:
+                    //If the level is 0, draw the crab nebula background.
+                    renderer->drawSprite(ResourceManager::getTexture("crab_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+                    break;
+                case 1:
+                    //If the level is 1, draw the pillars of creation background.
+                    renderer->drawSprite(ResourceManager::getTexture("pillars_of_creation"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+                    break;
+                case 2:
+                    //If the level is 2, draw the ring nebula background.
+                    renderer->drawSprite(ResourceManager::getTexture("ring_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+                    break;
+                case 3:
+                    //If the level is 2, draw the carina nebula background.
+                    renderer->drawSprite(ResourceManager::getTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+                    break;
+            }
+
+            //Draw the level blocks.
+            levels[level].draw(*renderer);
+
+            //Draw the paddle.
+            paddle->draw(*renderer);
+
+            //Draw each of the balls.
+            while (iterator) {
+                BallObject* ball = &iterator->data;
+                ball->draw(*renderer);
+                iterator = iterator->next;
+            }
+            break;
+        case GAME_START:
+            //In the case of the start state, draw the start screen background.
+            renderer->drawSprite(ResourceManager::getTexture("start_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+            break;
+        case GAME_WIN:
+            //In the case of the win state, draw the win screen background.
+            renderer->drawSprite(ResourceManager::getTexture("win_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+            break;
     }
 }
 
-
+//Function to reset the level if the player loses, the player beats a level, or the player wants to change levels.
 void Game::resetLevel() {
+    //Switch based on the value of the level.
     switch (level) {
         case 0:
             levels[0] = *new GameLevel("levels/one.lvl", width, height / 2);
@@ -231,166 +274,178 @@ void Game::resetLevel() {
     }
 }
 
-void Game::resetPlayer() {
-    // reset player/ball stats
-    player->size = PLAYER_SIZE;
-    player->position = glm::vec2(width / 2.0f - PLAYER_SIZE.x / 2.0f, height - PLAYER_SIZE.y);
+//Function to reset the game objects if the player loses, the player beats a level, or the player wants to change levels
+void Game::resetGameObjects() {
+    //Reste paddle size and position
+    paddle->size = PADDLE_SIZE;
+    paddle->position = glm::vec2(width / 2.0f - PADDLE_SIZE.x / 2.0f, height - PADDLE_SIZE.y);
+
+    //Reset the MultiBall object to only have one resetted ball.
     multiBall->head->next = nullptr;
     BallObject& ball = multiBall->head->data;
     ball = *new BallObject((&ball)->position, BALL_RADIUS, (&ball)->velocity, ResourceManager::getTexture("ball"));
-    (&ball)->reset(player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
+    (&ball)->reset(paddle->position + glm::vec2(PADDLE_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
 }
 
-// collision detection
-bool checkCollision(GameObject& one, GameObject& two);
-Collision checkCollision(BallObject& one, GameObject& two);
-Direction vectorDirection(glm::vec2 closest);
-
-void Game::doCollisions() {
-    for (GameObject& box : levels[level].bricks) {
-        if (!box.destroyed) {
+//Function to handle collisions.
+void Game::handleCollisions() {
+    //Iterate through each of the blocks in the current level.
+    for (GameObject& block : levels[level].bricks) {
+        if (!block.destroyed) {
+            //If the block is not destroyed, we want to check if any ball collided with it.
             Collision collision;
             BallObject* collidedBall = new BallObject();
-            MultiBall::Node* temp = multiBall->head;
-            while (temp) {
-                BallObject* ball = &temp->data;
-                collision = checkCollision(*ball, box);
+            MultiBall::Node* iterator = multiBall->head;
+
+            //Iterate through each of the balls and check if there is a collision.
+            while (iterator) {
+                BallObject* ball = &iterator->data;
+                collision = checkCollision(*ball, block);
                 if (std::get<0>(collision)) {
                     collidedBall = ball;
                     break;
                 }
-                temp = temp->next;
+                iterator = iterator->next;
             }
-            if (std::get<0>(collision)) {
-                float multiplier = 1;
 
-                // destroy block if not solid
-                if (!box.isSolid)
-                    box.destroyed = true;
-                //Check if bouncy
-                if (box.isBouncy)
+            //Check if there was a collision.
+            if (std::get<0>(collision)) {
+                
+
+                //If there was a collision, destroy the block.
+                block.destroyed = true;
+                
+                //Check if the block had special properties.
+                
+                //If the block is bouncy, set the speed multiplier to 1.1.
+                float multiplier = 1;
+                if (block.isBouncy)
                     multiplier = 1.1;
-                //Check if enlarging
-                if (box.isEnlarging) {
+
+                //If the block is enlarging, double the radius of the ball object.
+                if (block.isEnlarging) {
                     BallObject& collidedBallReference = *collidedBall;
                     collidedBallReference = *new BallObject(collidedBall->position, collidedBall->radius * 2, collidedBall->velocity, ResourceManager::getTexture("ball"));
                     collidedBall->stuck = false;
                 }
-                //Check if cloning
-                if (box.isCloning) {
-                    glm::vec2 ballPos = player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
+
+                //If the block is cloning, add another ball to the MultiBall and set its position to that of the paddle.
+                if (block.isCloning) {
+                    glm::vec2 ballPos = paddle->position + glm::vec2(PADDLE_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
                     BallObject ball = *new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::getTexture("ball"));
                     (&ball)->stuck = false;
                     multiBall->addFront(ball);
                 }
 
-                // collision resolution
+                //Update the velocity of the ball depending on the direction of the collision.
                 Direction dir = std::get<1>(collision);
                 glm::vec2 diff_vector = std::get<2>(collision);
                 if (dir == LEFT || dir == RIGHT) {
-                    collidedBall->velocity.x = -multiplier * collidedBall->velocity.x; // reverse horizontal velocity
-                    // relocate
+                    //If the collision is left or right, reverse the ball's horizontal velocity.
+                    collidedBall->velocity.x = -multiplier * collidedBall->velocity.x;
+                    
+                    //Move the ball to avoid multiple collisions
                     float penetration = collidedBall->radius - std::abs(diff_vector.x);
                     if (dir == LEFT)
-                        collidedBall->position.x += penetration; // move ball to right
+                        collidedBall->position.x += penetration;
                     else
-                        collidedBall->position.x -= penetration; // move ball to left;
-                }
-                else {
+                        collidedBall->position.x -= penetration;
+                } else {
+                    //If the collision is up or down, reverse the ball's vertical velocity.
                     collidedBall->velocity.y = -multiplier * collidedBall->velocity.y; // reverse vertical velocity
-                    // relocate
+
+                    //Move the ball to avoid multiple collisions
                     float penetration = collidedBall->radius - std::abs(diff_vector.y);
                     if (dir == UP)
-                        collidedBall->position.y -= penetration; // move ball bback up
+                        collidedBall->position.y -= penetration;
                     else
-                        collidedBall->position.y += penetration; // move ball back down
+                        collidedBall->position.y += penetration;
                 }
             }
         }
     }
-    // check collisions for player pad (unless stuck)
+
+    //Check for collisions between the ball and the paddle.
     Collision result;
     BallObject* collidedBall = new BallObject();
-    MultiBall::Node* temp = multiBall->head;
-    while (temp) {
-        BallObject* ball = &temp->data;
-        result = checkCollision(*ball, *player);
+    MultiBall::Node* iterator = multiBall->head;
+    while (iterator) {
+        BallObject* ball = &iterator->data;
+        result = checkCollision(*ball, *paddle);
         if (!ball->stuck && std::get<0>(result)) {
             collidedBall = ball;
             break;
         }
-        temp = temp->next;
+        iterator = iterator->next;
     }
+
+    //If there is a collision and the ball is not stuck to the paddle:
     if (!collidedBall->stuck && std::get<0>(result)) {
-        // check where it hit the board, and change velocity based on where it hit the board
-        float centerBoard = player->position.x + player->size.x / 2.0f;
+        //Update the ball's velocity based on where it hit the paddle.
+        float centerBoard = paddle->position.x + paddle->size.x / 2.0f;
         float distance = (collidedBall->position.x + collidedBall->radius) - centerBoard;
-        float percentage = distance / (player->size.x / 2.0f);
-        // then move accordingly
+        float percentage = distance / (paddle->size.x / 2.0f);
         float strength = 2.0f;
         glm::vec2 oldVelocity = collidedBall->velocity;
         collidedBall->velocity.x = INITIAL_BALL_VELOCITY.x * percentage * strength;
-        collidedBall->velocity = glm::normalize(collidedBall->velocity) * glm::length(oldVelocity); // keep speed consistent over both axes (multiply by length of old velocity, so total strength is not changed)
-        // fix sticky paddle
+        collidedBall->velocity = glm::normalize(collidedBall->velocity) * glm::length(oldVelocity);
+
+        //Reverse the ball's vertical velocity.
         collidedBall->velocity.y = -1.0f * abs(collidedBall->velocity.y);
     }
     
-    //Check if all blocks are destroyed
+    //Check if all blocks are destroyed.
     bool won = true;
-    for (GameObject& box : levels[level].bricks) {
-        if (!box.destroyed) {
+    for (GameObject& block : levels[level].bricks) {
+        if (!block.destroyed) {
             won = false;
         }
     }
     if (won) {
+        //If the level has been beaten, either reset and move on to the next or send the player to the win screen if it is the last level.
         if (level == 3) {
             state = GAME_WIN;
             return;
         }
         level = level + 1;
         resetLevel();
-        resetPlayer();
+        resetGameObjects();
     }
 }
 
-bool checkCollision(GameObject& one, GameObject& two) {
-    // collision x-axis?
-    bool collisionX = one.position.x + one.size.x >= two.position.x &&
-        two.position.x + two.size.x >= one.position.x;
-    // collision y-axis?
-    bool collisionY = one.position.y + one.size.y >= two.position.y &&
-        two.position.y + two.size.y >= one.position.y;
-    // collision only if on both axes
+//Helper function for seeing if there is a collision between two GameObjects.
+bool Game::checkCollision(GameObject& one, GameObject& two) {
+    //Separate the collision into its X and Y components.
+    bool collisionX = one.position.x + one.size.x >= two.position.x && two.position.x + two.size.x >= one.position.x;
+    bool collisionY = one.position.y + one.size.y >= two.position.y && two.position.y + two.size.y >= one.position.y;
+
+    //Return true if it collided on both components.
     return collisionX && collisionY;
 }
 
-Collision checkCollision(BallObject& one, GameObject& two) {
-    // get center point circle first 
+//Helper function for seeing if there is a collision between a Ball and a GameObject.
+Collision Game::checkCollision(BallObject& one, GameObject& two) {
     glm::vec2 center(one.position + one.radius);
-    // calculate AABB info (center, half-extents)
     glm::vec2 aabb_half_extents(two.size.x / 2.0f, two.size.y / 2.0f);
     glm::vec2 aabb_center(two.position.x + aabb_half_extents.x, two.position.y + aabb_half_extents.y);
-    // get difference vector between both centers
     glm::vec2 difference = center - aabb_center;
     glm::vec2 clamped = glm::clamp(difference, -aabb_half_extents, aabb_half_extents);
-    // now that we know the clamped values, add this to AABB_center and we get the value of box closest to circle
     glm::vec2 closest = aabb_center + clamped;
-    // now retrieve vector between center circle and closest point AABB and check if length < radius
     difference = closest - center;
 
-    if (glm::length(difference) < one.radius) // not <= since in that case a collision also occurs when object one exactly touches object two, which they are at the end of each collision resolution stage.
+    if (glm::length(difference) < one.radius)
         return std::make_tuple(true, vectorDirection(difference), difference);
     else
         return std::make_tuple(false, UP, glm::vec2(0.0f, 0.0f));
 }
 
-// calculates which direction a vector is facing (N,E,S or W)
-Direction vectorDirection(glm::vec2 target) {
+//Helper function for calculating which direction a vector is going.
+Direction Game::vectorDirection(glm::vec2 target) {
     glm::vec2 compass[] = {
-        glm::vec2(0.0f, 1.0f),	// up
-        glm::vec2(1.0f, 0.0f),	// right
-        glm::vec2(0.0f, -1.0f),	// down
-        glm::vec2(-1.0f, 0.0f)	// left
+        glm::vec2(0.0f, 1.0f),
+        glm::vec2(1.0f, 0.0f),
+        glm::vec2(0.0f, -1.0f),
+        glm::vec2(-1.0f, 0.0f)
     };
     float max = 0.0f;
     unsigned int best_match = -1;

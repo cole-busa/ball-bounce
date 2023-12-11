@@ -5,11 +5,12 @@
 #include <GLFW/glfw3.h>
 
 #include "game/game_level.h"
+#include "game/ball_object.h"
 
 // Represents the current state of the game
 enum GameState {
     GAME_ACTIVE,
-    GAME_MENU,
+    GAME_START,
     GAME_WIN
 };
 
@@ -24,9 +25,9 @@ enum Direction {
 typedef std::tuple<bool, Direction, glm::vec2> Collision; // <collision?, what direction?, difference vector center - closest point>
 
 // Initial size of the player paddle
-const glm::vec2 PLAYER_SIZE(150.0f, 20.0f);
+const glm::vec2 PADDLE_SIZE(150.0f, 20.0f);
 // Initial velocity of the player paddle
-const float PLAYER_VELOCITY(500.0f);
+const float PADDLE_VELOCITY(500.0f);
 // Initial velocity of the Ball
 const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
 // Radius of the ball object
@@ -52,10 +53,16 @@ class Game {
         void processInput(float dt);
         void update(float dt);
         void render();
-        void doCollisions();
+        
         // reset
         void resetLevel();
-        void resetPlayer();
+        void resetGameObjects();
+
+        //Collision functions.
+        void handleCollisions();
+        bool checkCollision(GameObject& one, GameObject& two);
+        Collision checkCollision(BallObject& one, GameObject& two);
+        Direction vectorDirection(glm::vec2 closest);
 };
 
 #endif

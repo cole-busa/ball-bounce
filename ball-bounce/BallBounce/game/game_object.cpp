@@ -8,7 +8,6 @@ GameObject::GameObject() {
     this->color = glm::vec3(1.0f);
     this->rotation = 0.0f;
     this->sprite;
-    this->isSolid = false;
     this->destroyed = false;
     this->isBouncy = false;
     this->isEnlarging = false;
@@ -22,7 +21,6 @@ GameObject::GameObject(glm::vec2 pos, glm::vec2 size, Texture2D sprite, glm::vec
     this->color = color;
     this->rotation = 0.0f;
     this->sprite = sprite; 
-    this->isSolid = false;
     this->destroyed = false;
     this->isBouncy = false;
     this->isEnlarging = false;

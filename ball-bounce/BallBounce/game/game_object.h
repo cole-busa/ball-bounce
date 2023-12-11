@@ -17,7 +17,6 @@ class GameObject {
         glm::vec2 position, size, velocity;
         glm::vec3 color;
         float rotation;
-        bool isSolid;
         bool destroyed;
         bool isBouncy;
         bool isEnlarging;
