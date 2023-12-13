@@ -14,7 +14,7 @@ GameObject::GameObject() {
     this->isCloning = false;
 }
 
-GameObject::GameObject(glm::vec2 pos, glm::vec2 size, Texture2D sprite, glm::vec3 color, glm::vec2 velocity) { 
+GameObject::GameObject(glm::vec2 pos, glm::vec2 size, Texture2D sprite, glm::vec3 color, glm::vec2 velocity, std::string type) { 
     this->position = pos;
     this->size = size;
     this->velocity = velocity;
@@ -22,9 +22,9 @@ GameObject::GameObject(glm::vec2 pos, glm::vec2 size, Texture2D sprite, glm::vec
     this->rotation = 0.0f;
     this->sprite = sprite; 
     this->destroyed = false;
-    this->isBouncy = false;
-    this->isEnlarging = false;
-    this->isCloning = false;
+    isBouncy = type == "bouncy";
+    isEnlarging = type == "enlarging";
+    isCloning = type == "cloning";
 }
 
 void GameObject::draw(SpriteRenderer& renderer) {
