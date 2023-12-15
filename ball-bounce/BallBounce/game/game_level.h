@@ -10,20 +10,23 @@
 #include "../graphics/resource_manager.h"
 
 
-/// GameLevel holds all Tiles as part of a Breakout level and 
-/// hosts functionality to Load/render levels from the harddisk.
+//GameLevel contains the data of one level.
 class GameLevel {
     public:
-        // level state
+        //Bricks in the level.
         std::vector<GameObject> bricks;
-        // constructor
+
+        //Constructor based on file, width and height.
         GameLevel(const char* file, unsigned int levelWidth, unsigned int levelHeight);
-        // render level
+
+        //Function to draw the level.
         void draw(SpriteRenderer& renderer);
-        // check if the level is completed (all non-solid tiles are destroyed)
+
+        //Function to see if the level is completed.
         bool isCompleted();
+
     private:
-        // initialize level from tile data
+        //Function to initialize the level.
         void init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight);
 };
 

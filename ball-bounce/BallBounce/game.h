@@ -33,7 +33,7 @@ const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
 //Starting radius of the ball.
 const float BALL_RADIUS = 25.0f;
 
-// Game contains all methods for the functionality of the game.
+//Game contains all methods for the functionality of the game.
 class Game {
     public:
         //Game state.

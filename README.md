@@ -1,4 +1,4 @@
-# ball-bounce
+# Ball Bounce
 
 ## Overview:
 

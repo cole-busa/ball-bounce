@@ -5,10 +5,12 @@
 #include <iostream>
 
 
+//Constructor based on file, width and height.
 GameLevel::GameLevel(const char* file, unsigned int levelWidth, unsigned int levelHeight) {
-    // clear old data
-    this->bricks.clear();
-    // load from file
+    //Clear old data.
+    bricks.clear();
+
+    //Load from file:
     unsigned int tileCode;
     std::string line;
     std::ifstream fstream(file);
@@ -17,28 +19,34 @@ GameLevel::GameLevel(const char* file, unsigned int levelWidth, unsigned int lev
         while (std::getline(fstream, line)) {
             std::istringstream sstream(line);
             std::vector<unsigned int> row;
-            while (sstream >> tileCode) // read each word separated by spaces
+            //Read each line separated by spaces.
+            while (sstream >> tileCode)
                 row.push_back(tileCode);
             tileData.push_back(row);
         }
         if (tileData.size() > 0)
-            this->init(tileData, levelWidth, levelHeight);
+            init(tileData, levelWidth, levelHeight);
     }
 }
 
+//Function to draw the level.
 void GameLevel::draw(SpriteRenderer& renderer) {
-    for (GameObject& tile : this->bricks)
+    //Draw only tiles that are not destroyed.
+    for (GameObject& tile : bricks)
         if (!tile.destroyed)
             tile.draw(renderer);
 }
 
+//Function to see if the level is completed.
 bool GameLevel::isCompleted() {
+    //Return true if all tiles are destroyed, otherwise return false.
     for (GameObject& tile : this->bricks)
         if (!tile.destroyed)
             return false;
     return true;
 }
 
+//Function to initialize the level.
 void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight) {
     //Playfield dimensions.
     unsigned int height = tileData.size();
@@ -80,6 +88,7 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
                 continue;
             }
             
+            //Create the Brick Game Object based on the previous information. Add it to the list of bricks.
             GameObject obj(pos, size, ResourceManager::getTexture("block"), color, glm::vec2(0.0f, 0.0f), type);
             bricks.push_back(obj);
         }
