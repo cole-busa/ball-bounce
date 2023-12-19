@@ -68,22 +68,20 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
                 //A tile value of 1 is a Bouncy Tile. It will increase the velocity of the ball more than a normal tile.
                 color = glm::vec3(1.0f, 0.75f, 0.8f);
                 type = "bouncy";
-            }
-            else if (tileData[y][x] == 2) {
+            } else if (tileData[y][x] == 2) {
                 //A tile value of 1 is a Enlarging Tile. It will double the radius of the ball.
                 color = glm::vec3(0.0f, 1.0f, 1.0f);
                 type = "enlarging";
-            }
-            else if (tileData[y][x] == 3) {
-                //A tile value of 1 is a Cloning Tile. It will spawn a new ball at the paddle position.
-                color = glm::vec3(0.5f, 0.5f, 0.5f);
-                type = "cloning";
             } else if (tileData[y][x] == 3) {
+                //A tile value of 1 is a Cloning Tile. It will spawn a new ball at the paddle position.
                 color = glm::vec3(1.0f, 0.0f, 0.0f);
+                type = "cloning";
             } else if (tileData[y][x] == 4) {
                 color = glm::vec3(0.0f, 1.0f, 0.0f); 
             } else if (tileData[y][x] == 5) {
                 color = glm::vec3(0.0f, 0.0f, 1.0f);
+            } else if (tileData[y][x] == 6) {
+                color = glm::vec3(1.0f, 1.0f, 1.0f);
             } else {
                 continue;
             }

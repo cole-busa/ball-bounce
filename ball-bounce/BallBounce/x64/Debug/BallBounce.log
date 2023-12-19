@@ -1,9 +1,4 @@
-﻿  game.cpp
-C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game.cpp(323,37): warning C4305: '=': truncation from 'double' to 'float'
-  game_level.cpp
-C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game\game_level.cpp(52,42): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game\game_level.cpp(53,44): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
-  main.cpp
-C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\main.cpp(58,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  Generating Code...
-  BallBounce.vcxproj -> C:\Users\coleb\Desktop\GitHub\ball-bounce\ball-bounce\x64\Debug\BallBounce.exe
+﻿  game_level.cpp
+C:\Users\coleb\OneDrive\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game\game_level.cpp(52,42): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\coleb\OneDrive\Desktop\GitHub\ball-bounce\ball-bounce\BallBounce\game\game_level.cpp(53,44): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  BallBounce.vcxproj -> C:\Users\coleb\OneDrive\Desktop\GitHub\ball-bounce\ball-bounce\x64\Debug\BallBounce.exe

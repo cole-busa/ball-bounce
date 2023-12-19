@@ -33,7 +33,7 @@
     <ClCompile Include="graphics\resource_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\sprte_renderer.cpp">
+    <ClCompile Include="graphics\sprite_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\game_object.cpp">

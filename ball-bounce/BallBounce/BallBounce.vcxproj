@@ -151,7 +151,7 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="graphics\resource_manager.cpp" />
     <ClCompile Include="graphics\shader.cpp" />
-    <ClCompile Include="graphics\sprte_renderer.cpp" />
+    <ClCompile Include="graphics\sprite_renderer.cpp" />
     <ClCompile Include="graphics\texture.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
