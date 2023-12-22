@@ -10,32 +10,36 @@
 #include "shader.h"
 
 
-// A static singleton ResourceManager class that hosts several
-// functions to load Textures and Shaders. Each loaded texture
-// and/or shader is also stored for future reference by string
-// handles. All functions and resources are static and no 
-// public constructor is defined.
+//ResourceManager is a framework for loading and storing shaders and textures.
 class ResourceManager {
     public:
-        // resource storage
+        //Storage for shaders and textures.
         static std::map<std::string, Shader> shaders;
         static std::map<std::string, Texture2D> textures;
-        // loads (and generates) a shader program from file loading vertex, fragment (and geometry) shader's source code. If gShaderFile is not nullptr, it also loads a geometry shader
+
+        //Function to load, store, and return a shader from the given vertex, fragment, and geometry source files under the given name. Geometry data is optional.
         static Shader loadShader(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile, std::string name);
-        // retrieves a stored sader
+
+        //Function to return a shader from storage.
         static Shader getShader(std::string name);
-        // loads (and generates) a texture from file
+
+        //Function to load, store, and return a texture from the given file under the given name.
         static Texture2D loadTexture(const char* file, bool alpha, std::string name);
-        // retrieves a stored texture
+
+        //Function to return a texture from storage.
         static Texture2D getTexture(std::string name);
-        // properly de-allocates all loaded resources
+
+        //Function to clear all storage.
         static void clear();
+
     private:
-        // private constructor, that is we do not want any actual resource manager objects. Its members and functions should be publicly available (static).
-        ResourceManager() { }
-        // loads and generates a shader from file
+        //Private constructor because there should not be a resource manager object.
+        ResourceManager() {}
+
+        //Function to load and return a shader from a file.
         static Shader loadShaderFromFile(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile = nullptr);
-        // loads a single texture from file
+
+        //Function to load and return a texture from a file.
         static Texture2D loadTextureFromFile(const char* file, bool alpha);
 };
 

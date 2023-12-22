@@ -3,27 +3,40 @@
 
 #include <glad/glad.h>
 
-// Texture2D is able to store and configure a texture in OpenGL.
-// It also hosts utility functions for easy management.
+//Texture2D contains the means to store and configure a texture.
 class Texture2D {
     public:
-        // holds the ID of the texture object, used for all texture operations to reference to this particular texture
+        //Every texture has a unique id.
         unsigned int id;
-        // texture image dimensions
-        unsigned int width, height; // width and height of loaded image in pixels
-        // texture Format
-        unsigned int internalFormat; // format of texture object
-        unsigned int imageFormat; // format of loaded image
-        // texture configuration
-        unsigned int wrapS; // wrapping mode on S axis
-        unsigned int wrapT; // wrapping mode on T axis
-        unsigned int filterMin; // filtering mode if texture pixels < screen pixels
-        unsigned int filterMax; // filtering mode if texture pixels > screen pixels
-        // constructor (sets default texture modes)
+
+        //Texture image dimensions in pixels.
+        unsigned int width, height;
+
+        //Texture format.
+        unsigned int internalFormat;
+
+        //Loaded image format.
+        unsigned int imageFormat;
+
+        //Texture configuration:
+        //Wrapping mode on S axis.
+        unsigned int wrapS;
+
+        //Wrapping mode on T axis
+        unsigned int wrapT; 
+
+        //Filtering mode if texture pixels < screen pixels.
+        unsigned int filterMin; 
+        //Filtering mode if texture pixels > screen pixels.
+        unsigned int filterMax;
+
+        //Default constructor.
         Texture2D();
-        // generates texture from image data
+
+        //Function to generate texture from image data.
         void generate(unsigned int width, unsigned int height, unsigned char* data);
-        // binds the texture as the current active GL_TEXTURE_2D texture object
+
+        //Function to bind the texture as the current active GL_TEXTURE_2D object.
         void bind() const;
 };
 

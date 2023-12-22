@@ -15,15 +15,23 @@ GameLevel::GameLevel(const char* file, unsigned int levelWidth, unsigned int lev
     std::string line;
     std::ifstream fstream(file);
     std::vector<std::vector<unsigned int>> tileData;
+
+    //If the file stream was loaded:
     if (fstream) {
         while (std::getline(fstream, line)) {
+            //Read each line as a string stream.
             std::istringstream sstream(line);
+
+            //Storage for each line.
             std::vector<unsigned int> row;
-            //Read each line separated by spaces.
+
+            //Read each line separated by spaces and store them.
             while (sstream >> tileCode)
                 row.push_back(tileCode);
             tileData.push_back(row);
         }
+
+        //If the tileData was read, initialize the level.
         if (tileData.size() > 0)
             init(tileData, levelWidth, levelHeight);
     }
@@ -33,7 +41,7 @@ GameLevel::GameLevel(const char* file, unsigned int levelWidth, unsigned int lev
 void GameLevel::draw(SpriteRenderer& renderer) {
     //Draw only tiles that are not destroyed.
     for (GameObject& tile : bricks)
-        if (!tile.destroyed)
+        if (!tile.isDestroyed)
             tile.draw(renderer);
 }
 
@@ -41,7 +49,7 @@ void GameLevel::draw(SpriteRenderer& renderer) {
 bool GameLevel::isCompleted() {
     //Return true if all tiles are destroyed, otherwise return false.
     for (GameObject& tile : this->bricks)
-        if (!tile.destroyed)
+        if (!tile.isDestroyed)
             return false;
     return true;
 }

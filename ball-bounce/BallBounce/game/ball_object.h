@@ -22,7 +22,7 @@ class BallObject : public GameObject {
         //Function to move the ball, keeping it constrained within the bounds of the window. Returns new position.
         glm::vec2 move(float dt, unsigned int window_width);
 
-        //Function to reset the ball to initial stuck position.
+        //Function to reset the ball to the passed in position and velocity
         void reset(glm::vec2 position, glm::vec2 velocity);
 };
 

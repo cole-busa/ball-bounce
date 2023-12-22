@@ -9,19 +9,26 @@
 #include "shader.h"
 
 
+//SpriteRenderer contains the framework to render a sprite.
 class SpriteRenderer {
     public:
-        // Constructor (inits shaders/shapes)
+        //Constructor that intializes a passed in shader.
         SpriteRenderer(Shader shader);
-        // Destructor
+
+        //Destructor.
         ~SpriteRenderer();
-        // Renders a defined quad textured with given sprite
+
+        //Function to render a passed in sprite.
         void drawSprite(Texture2D texture, glm::vec2 position, glm::vec2 size = glm::vec2(10.0f, 10.0f), float rotate = 0.0f, glm::vec3 color = glm::vec3(1.0f));
+    
     private:
-        // Render state
+        //Shader variable is stored privately.
         Shader shader;
+
+        //Quad Vertex Array Object id.
         unsigned int quadVAO;
-        // Initializes and configures the quad's buffer and vertex attributes
+
+        //Function to initialize and configure the quad's VAO and VBO attributes.
         void initRenderData();
 };
 

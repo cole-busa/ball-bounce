@@ -8,26 +8,29 @@
 #include "../graphics/sprite_renderer.h"
 
 
-// Container object for holding all state relevant for a single
-// game object entity. Each object in the game likely needs the
-// minimal of state as described within GameObject.
+//GameObject contains a the framework for base object in Ball Bounce.
+//Each GameObject will have a position, size, velocity, color, and rotation.
+//It will also have booleans depicting whether or not it is destroyed,
+//bouncy, enlarging, or cloning.
 class GameObject {
     public:
-        // object state
+        //Object properties.
         glm::vec2 position, size, velocity;
         glm::vec3 color;
         float rotation;
-        bool destroyed;
-        bool isBouncy;
-        bool isEnlarging;
-        bool isCloning;
-        // render state
+
+        //Booleans denoting special properties of the object.
+        bool isDestroyed, isBouncy, isEnlarging, isCloning;
+
+        //Texture of the object.
         Texture2D sprite;
-        // constructor(s)
+
+        //Constructors.
         GameObject();
         GameObject(glm::vec2 pos, glm::vec2 size, Texture2D sprite, glm::vec3 color = glm::vec3(1.0f), glm::vec2 velocity = glm::vec2(0.0f, 0.0f), std::string type = "none");
-        // draw sprite
-        virtual void draw(SpriteRenderer& renderer);
+        
+        //Function to draw the object's sprite.
+        void draw(SpriteRenderer& renderer);
 };
 
 #endif

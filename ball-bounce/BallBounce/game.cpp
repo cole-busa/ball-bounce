@@ -291,7 +291,7 @@ void Game::resetGameObjects() {
 void Game::handleCollisions() {
     //Iterate through each of the blocks in the current level.
     for (GameObject& block : levels[level].bricks) {
-        if (!block.destroyed) {
+        if (!block.isDestroyed) {
             //If the block is not destroyed, we want to check if any ball collided with it.
             Collision collision;
             BallObject* collidedBall = new BallObject();
@@ -313,7 +313,7 @@ void Game::handleCollisions() {
                 
 
                 //If there was a collision, destroy the block.
-                block.destroyed = true;
+                block.isDestroyed = true;
                 
                 //Check if the block had special properties.
                 
@@ -397,7 +397,7 @@ void Game::handleCollisions() {
     //Check if all blocks are destroyed.
     bool won = true;
     for (GameObject& block : levels[level].bricks) {
-        if (!block.destroyed) {
+        if (!block.isDestroyed) {
             won = false;
         }
     }

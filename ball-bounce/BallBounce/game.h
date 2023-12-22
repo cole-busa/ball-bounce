@@ -7,6 +7,7 @@
 #include "game/game_level.h"
 #include "game/ball_object.h"
 
+
 //Enum for the current game state. Active is the playing state, start is the start screen, and win is the win screen.
 enum GameState {
     GAME_ACTIVE,
@@ -21,6 +22,7 @@ enum Direction {
     DOWN,
     LEFT
 };
+
 //Collision type that contains if a collision happened, the direction it happened in, and the size of the collision.
 typedef std::tuple<bool, Direction, glm::vec2> Collision;
 
