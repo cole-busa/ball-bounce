@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+
 //Game variables.
 SpriteRenderer* renderer;
 GameObject* paddle;
@@ -339,6 +340,7 @@ void Game::handleCollisions() {
 
                 //Update the velocity of the ball depending on the direction of the collision.
                 Direction dir = std::get<1>(collision);
+                std::cout << dir;
                 glm::vec2 diff_vector = std::get<2>(collision);
                 if (dir == LEFT || dir == RIGHT) {
                     //If the collision is left or right, reverse the ball's horizontal velocity.
