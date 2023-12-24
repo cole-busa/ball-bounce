@@ -326,8 +326,9 @@ void Game::handleCollisions() {
                 //If the block is enlarging, double the radius of the ball object.
                 if (block.isEnlarging) {
                     BallObject& collidedBallReference = *collidedBall;
-                    collidedBallReference = *new BallObject(collidedBall->position, collidedBall->radius * 2, collidedBall->velocity, ResourceManager::getTexture("ball"));
-                    collidedBall->stuck = false;
+                    glm::vec2 newPos = paddle->position + glm::vec2(PADDLE_SIZE.x / 2.0f - collidedBall->radius * 2, -collidedBall->radius * 5.0f);
+                    collidedBallReference = *new BallObject(newPos, collidedBall->radius * 2, collidedBall->velocity, ResourceManager::getTexture("ball"));
+                    collidedBall->stuck = true;
                 }
 
                 //If the block is cloning, add another ball to the MultiBall and set its position to that of the paddle.
@@ -340,7 +341,6 @@ void Game::handleCollisions() {
 
                 //Update the velocity of the ball depending on the direction of the collision.
                 Direction dir = std::get<1>(collision);
-                std::cout << dir;
                 glm::vec2 diff_vector = std::get<2>(collision);
                 if (dir == LEFT || dir == RIGHT) {
                     //If the collision is left or right, reverse the ball's horizontal velocity.
