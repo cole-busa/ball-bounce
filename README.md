@@ -19,19 +19,19 @@ The game opens to the following screen:
 
 Upon pressing space, the game begins at level 1, with a background of the Crab Nebula. This level includes red cloning bricks:
 
-![plot](./ball-bounce/Media/level1.png)
+![plot](./ball-bounce/Media/level1.gif)
 
 Next, we are taken to level 2, where we can gaze upon the beauty of the Pillars of Creation. This level includes cyan enlarging bricks:
 
-![plot](./ball-bounce/Media/level2.png)
+![plot](./ball-bounce/Media/level2.gif)
 
 Then, we emerge in level 3, showcasing the incredible Ring Nebula. This level includes pink bouncy bricks:
 
-![plot](./ball-bounce/Media/level3.png)
+![plot](./ball-bounce/Media/level3.gif)
 
 Finally, we reach level 4, which highlights the gorgeous Carina Nebula. This level combines all special bricks:
 
-![plot](./ball-bounce/Media/level4.png)
+![plot](./ball-bounce/Media/level4.gif)
 
 If you are skilled enough to complete these levels, you win:
 
