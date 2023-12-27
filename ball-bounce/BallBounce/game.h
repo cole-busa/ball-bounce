@@ -53,6 +53,9 @@ class Game {
         //Level that the player is on.
         unsigned int level;
 
+        //Score of the player.
+        int score;
+
         //Constructor and destructor.
         Game(unsigned int width, unsigned int height);
         ~Game();

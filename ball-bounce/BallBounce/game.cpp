@@ -6,6 +6,7 @@
 #include "game/multi_ball.h"
 
 #include <iostream>
+#include <unordered_map>
 
 
 //Game variables.
@@ -67,7 +68,10 @@ void Game::init() {
     levels.push_back(*two);
     levels.push_back(*three);
     levels.push_back(*four);
+
+    //Initialize level and score.
     level = 0;
+    score = 0;
 
     //Create game objects.
     glm::vec2 paddlePos = glm::vec2(width / 2.0f - PADDLE_SIZE.x / 2.0f, height - PADDLE_SIZE.y);
@@ -311,13 +315,13 @@ void Game::handleCollisions() {
 
             //Check if there was a collision.
             if (std::get<0>(collision)) {
-                
-
                 //If there was a collision, destroy the block.
                 block.isDestroyed = true;
                 
-                //Check if the block had special properties.
-                
+                //Increase the score by 1000 for every block destroyed.
+                score += 100;
+
+                //Check if the block had special properties:
                 //If the block is bouncy, set the speed multiplier to 1.1.
                 float multiplier = 1;
                 if (block.isBouncy)
@@ -326,9 +330,13 @@ void Game::handleCollisions() {
                 //If the block is enlarging, double the radius of the ball object.
                 if (block.isEnlarging) {
                     BallObject& collidedBallReference = *collidedBall;
-                    glm::vec2 newPos = paddle->position + glm::vec2(PADDLE_SIZE.x / 2.0f - collidedBall->radius * 2, -collidedBall->radius * 5.0f);
-                    collidedBallReference = *new BallObject(newPos, collidedBall->radius * 2, collidedBall->velocity, ResourceManager::getTexture("ball"));
-                    collidedBall->stuck = true;
+
+                    //Only increase the radius if it is not too large.
+                    if (collidedBall->radius < 100) {
+                        glm::vec2 newPos = paddle->position + glm::vec2(PADDLE_SIZE.x / 2.0f - collidedBall->radius * 2, -collidedBall->radius * 5.0f);
+                        collidedBallReference = *new BallObject(newPos, collidedBall->radius * 2, collidedBall->velocity, ResourceManager::getTexture("ball"));
+                        collidedBall->stuck = true;
+                    }
                 }
 
                 //If the block is cloning, add another ball to the MultiBall and set its position to that of the paddle.
@@ -407,6 +415,7 @@ void Game::handleCollisions() {
         //If the level has been beaten, either reset and move on to the next or send the player to the win screen if it is the last level.
         if (level == 3) {
             state = GAME_WIN;
+            std::cout << "Your final score is " << score << "!" << std::endl;
             return;
         }
         level = level + 1;
