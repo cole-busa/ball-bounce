@@ -13,6 +13,7 @@
 SpriteRenderer* renderer;
 GameObject* paddle;
 MultiBall* multiBall;
+std::unordered_map<int, Texture2D> levelTextureMap;
 
 //Constructor for a Game with screen width and height.
 Game::Game(unsigned int width, unsigned int height) {
@@ -49,10 +50,10 @@ void Game::init() {
     ResourceManager::loadTexture("graphics/win_screen.jpg", false, "win_screen");
 
     //Level backgrounds.
-    ResourceManager::loadTexture("graphics/crab_nebula.jpg", false, "crab_nebula");
-    ResourceManager::loadTexture("graphics/pillars_of_creation.jpg", false, "pillars_of_creation");
-    ResourceManager::loadTexture("graphics/ring_nebula.jpg", false, "ring_nebula");
-    ResourceManager::loadTexture("graphics/carina_nebula.jpg", false, "carina_nebula");
+    levelTextureMap[0] = ResourceManager::loadTexture("graphics/crab_nebula.jpg", false, "crab_nebula");
+    levelTextureMap[1] = ResourceManager::loadTexture("graphics/pillars_of_creation.jpg", false, "pillars_of_creation");
+    levelTextureMap[2] = ResourceManager::loadTexture("graphics/ring_nebula.jpg", false, "ring_nebula");
+    levelTextureMap[3] = ResourceManager::loadTexture("graphics/carina_nebula.jpg", false, "carina_nebula");
 
     //Game objects.
     ResourceManager::loadTexture("graphics/ball.png", true, "ball");
@@ -89,10 +90,13 @@ void Game::update(float dt) {
     MultiBall::Node* previous = nullptr;
     while (current) {
         BallObject* ball = &current->data;
+
         //Move each ball.
         ball->move(dt, width);
+
         //Check each ball for collisions.
         handleCollisions();
+
         //Check if the ball has exited the playzone.
         if (ball->position.y >= height) {
             if (!multiBall->head->next) {
@@ -121,10 +125,9 @@ void Game::update(float dt) {
 void Game::processInput(float dt) {
     if (state == GAME_START) {
         //In the start state, we only check if the user presses space and start the game if they do.
-        if (keys[GLFW_KEY_SPACE]) {
+        if (keys[GLFW_KEY_SPACE])
             state = GAME_ACTIVE;
-        }
-    } else if (state == GAME_ACTIVE) {
+    } else if (state == GAME_ACTIVE || state == GAME_RANDOM) {
         //If the state is active, we want to check moving the paddle left and right, unsticking the ball, and changing the level.
         //Velocity is useful for updating the paddle and stuck ball positions.
         float velocity = PADDLE_VELOCITY * dt;
@@ -173,37 +176,46 @@ void Game::processInput(float dt) {
             }
         }
 
-        //If the player inputs the 1 key, we want to go to the first level. This is both for convenience and testing purposes.
-        if (keys[GLFW_KEY_1]) {
-            level = 0;
+        if (state == GAME_ACTIVE) {
+            //If the player inputs the 1 key, we want to go to the first level. This is both for convenience and testing purposes.
+            if (keys[GLFW_KEY_1]) {
+                level = 0;
+                resetLevel();
+                resetGameObjects();
+            }
+
+            //If the player inputs the 2 key, we want to go to the second level. This is both for convenience and testing purposes.
+            if (keys[GLFW_KEY_2]) {
+                level = 1;
+                resetLevel();
+                resetGameObjects();
+            }
+
+            //If the player inputs the 3 key, we want to go to the third level. This is both for convenience and testing purposes.
+            if (keys[GLFW_KEY_3]) {
+                level = 2;
+                resetLevel();
+                resetGameObjects();
+            }
+
+            //If the player inputs the 4 key, we want to go to the fourth level. This is both for convenience and testing purposes.
+            if (keys[GLFW_KEY_4]) {
+                level = 3;
+                resetLevel();
+                resetGameObjects();
+            }
+
+            //If the player inputs the 5 key, we want to go to the win screen. This is for testing purposes.
+            if (keys[GLFW_KEY_5]) {
+                state = GAME_WIN;
+            }
+        }
+    } else if (state == GAME_WIN) {
+        //In the win state, we check if the user presses space and move to the secret random levels if they do.
+        if (keys[GLFW_KEY_SPACE]) {
+            state = GAME_RANDOM;
             resetLevel();
             resetGameObjects();
-        }
-
-        //If the player inputs the 2 key, we want to go to the second level. This is both for convenience and testing purposes.
-        if (keys[GLFW_KEY_2]) {
-            level = 1;
-            resetLevel();
-            resetGameObjects();
-        }
-
-        //If the player inputs the 3 key, we want to go to the third level. This is both for convenience and testing purposes.
-        if (keys[GLFW_KEY_3]) {
-            level = 2;
-            resetLevel();
-            resetGameObjects();
-        }
-
-        //If the player inputs the 4 key, we want to go to the fourth level. This is both for convenience and testing purposes.
-        if (keys[GLFW_KEY_4]) {
-            level = 3;
-            resetLevel();
-            resetGameObjects();
-        }
-
-        //If the player inputs the 5 key, we want to go to the win screen. This is for testing purposes.
-        if (keys[GLFW_KEY_5]) {
-            state = GAME_WIN;
         }
     }
 }
@@ -215,26 +227,18 @@ void Game::render() {
 
     //Switch based on the state enum value.
     switch (state) {
-        case GAME_ACTIVE:
-            //In the case of an active game, we want to draw the right background, the level blocks, the paddle, and the balls.
-            switch (level) {
-                case 0:
-                    //If the level is 0, draw the crab nebula background.
-                    renderer->drawSprite(ResourceManager::getTexture("crab_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-                    break;
-                case 1:
-                    //If the level is 1, draw the pillars of creation background.
-                    renderer->drawSprite(ResourceManager::getTexture("pillars_of_creation"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-                    break;
-                case 2:
-                    //If the level is 2, draw the ring nebula background.
-                    renderer->drawSprite(ResourceManager::getTexture("ring_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-                    break;
-                case 3:
-                    //If the level is 2, draw the carina nebula background.
-                    renderer->drawSprite(ResourceManager::getTexture("carina_nebula"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-                    break;
-            }
+        case GAME_START:
+            //In the case of the start state, draw the start screen background.
+            renderer->drawSprite(ResourceManager::getTexture("start_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+            break;
+        case GAME_WIN:
+            //In the case of the win state, draw the win screen background.
+            renderer->drawSprite(ResourceManager::getTexture("win_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+            break;
+        default:
+            //In the case of an active or random game, we want to draw the right background, the level blocks, the paddle, and the balls.
+            //Draw the level background.
+            renderer->drawSprite(levelTextureMap[level], glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
 
             //Draw the level blocks.
             levels[level].draw(*renderer);
@@ -248,14 +252,6 @@ void Game::render() {
                 ball->draw(*renderer);
                 iterator = iterator->next;
             }
-            break;
-        case GAME_START:
-            //In the case of the start state, draw the start screen background.
-            renderer->drawSprite(ResourceManager::getTexture("start_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
-            break;
-        case GAME_WIN:
-            //In the case of the win state, draw the win screen background.
-            renderer->drawSprite(ResourceManager::getTexture("win_screen"), glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
             break;
     }
 }
@@ -411,14 +407,20 @@ void Game::handleCollisions() {
             won = false;
         }
     }
+
+    //If the level has been beaten:
     if (won) {
-        //If the level has been beaten, either reset and move on to the next or send the player to the win screen if it is the last level.
+        //If it is the last level:
         if (level == 3) {
+            //Send the player to the win screen and print the final score.
             state = GAME_WIN;
             std::cout << "Your final score is " << score << "!" << std::endl;
             return;
         }
-        level = level + 1;
+
+        //Otherwise, reset, add 1000 to the score, and move on to the next level.
+        score += 1000;
+        level += 1;
         resetLevel();
         resetGameObjects();
     }

@@ -12,7 +12,8 @@
 enum GameState {
     GAME_ACTIVE,
     GAME_START,
-    GAME_WIN
+    GAME_WIN,
+    GAME_RANDOM
 };
 
 //Enum for the directions a collision can take.
