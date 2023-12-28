@@ -6,14 +6,12 @@
 #include "game/multi_ball.h"
 
 #include <iostream>
-#include <unordered_map>
 
 
 //Game variables.
 SpriteRenderer* renderer;
 GameObject* paddle;
 MultiBall* multiBall;
-std::unordered_map<int, Texture2D> levelTextureMap;
 
 //Constructor for a Game with screen width and height.
 Game::Game(unsigned int width, unsigned int height) {
@@ -71,7 +69,8 @@ void Game::init() {
     levels.push_back(*four);
 
     //Initialize level and score.
-    level = 0;
+    backgroundLevel = 0;
+    brickLevel = 0;
     score = 0;
 
     //Create game objects.
@@ -179,28 +178,32 @@ void Game::processInput(float dt) {
         if (state == GAME_ACTIVE) {
             //If the player inputs the 1 key, we want to go to the first level. This is both for convenience and testing purposes.
             if (keys[GLFW_KEY_1]) {
-                level = 0;
+                backgroundLevel = 0;
+                brickLevel = 0;
                 resetLevel();
                 resetGameObjects();
             }
 
             //If the player inputs the 2 key, we want to go to the second level. This is both for convenience and testing purposes.
             if (keys[GLFW_KEY_2]) {
-                level = 1;
+                backgroundLevel = 1;
+                brickLevel = 1;
                 resetLevel();
                 resetGameObjects();
             }
 
             //If the player inputs the 3 key, we want to go to the third level. This is both for convenience and testing purposes.
             if (keys[GLFW_KEY_3]) {
-                level = 2;
+                backgroundLevel = 2;
+                brickLevel = 2;
                 resetLevel();
                 resetGameObjects();
             }
 
             //If the player inputs the 4 key, we want to go to the fourth level. This is both for convenience and testing purposes.
             if (keys[GLFW_KEY_4]) {
-                level = 3;
+                backgroundLevel = 3;
+                brickLevel = 3;
                 resetLevel();
                 resetGameObjects();
             }
@@ -214,7 +217,12 @@ void Game::processInput(float dt) {
         //In the win state, we check if the user presses space and move to the secret random levels if they do.
         if (keys[GLFW_KEY_SPACE]) {
             state = GAME_RANDOM;
-            resetLevel();
+            GameLevel* five = new GameLevel(width, height / 2);
+            levels.push_back(*five);
+            int min = 0;
+            int max = 3;
+            backgroundLevel = min + rand() % (max - min + 1);
+            brickLevel = 4;
             resetGameObjects();
         }
     }
@@ -238,10 +246,10 @@ void Game::render() {
         default:
             //In the case of an active or random game, we want to draw the right background, the level blocks, the paddle, and the balls.
             //Draw the level background.
-            renderer->drawSprite(levelTextureMap[level], glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
+            renderer->drawSprite(levelTextureMap[backgroundLevel], glm::vec2(0.0f, 0.0f), glm::vec2(width, height), 0.0f);
 
-            //Draw the level blocks.
-            levels[level].draw(*renderer);
+            //Draw the level bricks.
+            levels[brickLevel].draw(*renderer);
 
             //Draw the paddle.
             paddle->draw(*renderer);
@@ -259,7 +267,14 @@ void Game::render() {
 //Function to reset the level if the player loses, the player beats a level, or the player wants to change levels.
 void Game::resetLevel() {
     //Switch based on the value of the level.
-    switch (level) {
+    if (state == GAME_RANDOM) {
+        int min = 0;
+        int max = 3;
+        backgroundLevel = min + rand() % (max - min + 1);
+        levels[4] = *new GameLevel(width, height / 2);
+        return;
+    }
+    switch (brickLevel) {
         case 0:
             levels[0] = *new GameLevel("levels/one.lvl", width, height / 2);
             break;
@@ -291,7 +306,7 @@ void Game::resetGameObjects() {
 //Function to handle collisions.
 void Game::handleCollisions() {
     //Iterate through each of the blocks in the current level.
-    for (GameObject& block : levels[level].bricks) {
+    for (GameObject& block : levels[brickLevel].bricks) {
         if (!block.isDestroyed) {
             //If the block is not destroyed, we want to check if any ball collided with it.
             Collision collision;
@@ -399,10 +414,9 @@ void Game::handleCollisions() {
         //Reverse the ball's vertical velocity.
         collidedBall->velocity.y = -1.0f * abs(collidedBall->velocity.y);
     }
-    
     //Check if all blocks are destroyed.
     bool won = true;
-    for (GameObject& block : levels[level].bricks) {
+    for (GameObject& block : levels[brickLevel].bricks) {
         if (!block.isDestroyed) {
             won = false;
         }
@@ -411,8 +425,12 @@ void Game::handleCollisions() {
     //If the level has been beaten:
     if (won) {
         //If it is the last level:
-        if (level == 3) {
+        if (brickLevel == 3) {
             //Send the player to the win screen and print the final score.
+            int min = 0;
+            int max = 3;
+            backgroundLevel = min + rand() % (max - min + 1);
+            brickLevel += 1;
             state = GAME_WIN;
             std::cout << "Your final score is " << score << "!" << std::endl;
             return;
@@ -420,7 +438,14 @@ void Game::handleCollisions() {
 
         //Otherwise, reset, add 1000 to the score, and move on to the next level.
         score += 1000;
-        level += 1;
+        if (state != GAME_RANDOM) {
+            brickLevel += 1;
+            backgroundLevel += 1;
+        } else {
+            int min = 0;
+            int max = 3;
+            backgroundLevel = min + rand() % (max - min + 1);
+        }
         resetLevel();
         resetGameObjects();
     }

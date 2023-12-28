@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <unordered_map>
+
 #include "game/game_level.h"
 #include "game/ball_object.h"
 
@@ -51,8 +53,14 @@ class Game {
         //Contains brick level data.
         std::vector<GameLevel> levels;
 
-        //Level that the player is on.
-        unsigned int level;
+        //Contains level texture data.
+        std::unordered_map<int, Texture2D> levelTextureMap;
+
+        //Background level that the player is on.
+        unsigned int backgroundLevel;
+
+        //Brick level that the player is on.
+        unsigned int brickLevel;
 
         //Score of the player.
         int score;

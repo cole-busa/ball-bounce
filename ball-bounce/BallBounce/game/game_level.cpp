@@ -3,18 +3,19 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <cstdlib>
 
 
 //Constructor based on file, width and height.
 GameLevel::GameLevel(const char* file, unsigned int levelWidth, unsigned int levelHeight) {
     //Clear old data.
     bricks.clear();
+    tileData.clear();
 
     //Load from file:
     unsigned int tileCode;
     std::string line;
     std::ifstream fstream(file);
-    std::vector<std::vector<unsigned int>> tileData;
 
     //If the file stream was loaded:
     if (fstream) {
@@ -35,6 +36,26 @@ GameLevel::GameLevel(const char* file, unsigned int levelWidth, unsigned int lev
         if (tileData.size() > 0)
             init(tileData, levelWidth, levelHeight);
     }
+}
+
+//Constructor for creating a random level.
+GameLevel::GameLevel(unsigned int levelWidth, unsigned int levelHeight) {
+    //Clear old data.
+    bricks.clear();
+    tileData.clear();
+
+    for (int i = 0; i < levelHeight / 50; i++) {
+        std::vector<unsigned int> row;
+        for (int j = 0; j < levelWidth / 80; j++) {
+            //Generate random tile codes and add them to the tile data.
+            int min = 0;
+            int max = 6;
+            int randomTileCode = min + rand() % (max - min + 1);
+            row.push_back(randomTileCode);
+        }
+        tileData.push_back(row);
+    }
+    init(tileData, levelWidth, levelHeight);
 }
 
 //Function to draw the level.

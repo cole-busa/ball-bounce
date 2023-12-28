@@ -13,11 +13,17 @@
 //GameLevel contains the data of one level.
 class GameLevel {
     public:
+        //Tile data of the level.
+        std::vector<std::vector<unsigned int>> tileData;
+
         //Bricks in the level.
         std::vector<GameObject> bricks;
 
         //Constructor based on file, width and height.
         GameLevel(const char* file, unsigned int levelWidth, unsigned int levelHeight);
+
+        //Constructor for creating a random level.
+        GameLevel(unsigned int levelWidth, unsigned int levelHeight);
 
         //Function to draw the level.
         void draw(SpriteRenderer& renderer);
