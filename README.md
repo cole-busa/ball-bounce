@@ -37,6 +37,10 @@ If you are skilled enough to complete these levels, you win:
 
 ![plot](./ball-bounce/Media/win_screen.png)
 
+However, there is a hidden feature if you press space on the home screen. Doing this generates endless random levels which could look something like this:
+
+![plot](./ball-bounce/Media/random_level.png)
+
 ## Try it out!
 
 To try this project out, simply download the repository and open it using Visual Studio 2019. Any other version will not be supported. This is because it was the latest Visual Studio version supported by the dependencies, so I chose it as the base version. Press the play button in the top middle titled Local Windows Debugger and enjoy the resulting gameplay. Thanks for reading this far about my project, I hope you enjoyed! :partying_face:
